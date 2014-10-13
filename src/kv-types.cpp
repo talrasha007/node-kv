@@ -104,7 +104,7 @@ namespace kv {
 
 	template<> Local<Value> number_type<int64_t>::v8value() {
 		char buf[32];
-		sprintf(buf, "%lld", _val);
+		sprintf(buf, "%lld", (long long int)_val);
 		return NanNew(buf);
 	}
 }
