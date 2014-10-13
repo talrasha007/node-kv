@@ -4,12 +4,16 @@
       "target_name": "kv",
 	  "include_dirs" : [
         "<!(node -e \"require('nan')\")",
-        "3rd-party"
+        "3rd-party/include"
       ],
       "sources": [
         "3rd-party/liblmdb/mdb.c",
         "3rd-party/liblmdb/midl.c",
-        "src/node-binding.cpp"
+        "src/node-binding.cpp",
+        "src/lmdb/env.cpp",
+        "src/lmdb/db.cpp",
+        "src/lmdb/cursor.cpp",
+        "src/lmdb/txn.cpp"
       ],
       "conditions": [
         [
