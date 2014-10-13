@@ -1,14 +1,11 @@
 #include <nan.h>
 
-#include "lmdb/env.h"
+#include "lmdb/setup.h"
 
 using namespace v8;
 
 void init(v8::Handle<v8::Object> exports) {
-	Local<Object> lmdb = NanNew<Object>();
-	kv::lmdb::env::setup_export(lmdb);
-
-	exports->Set(NanNew("lmdb"), lmdb);
+	exports->Set(NanNew("lmdb"), kv::lmdb::v8export());
 }
 
 NODE_MODULE(kv, init);

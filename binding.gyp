@@ -11,6 +11,7 @@
         "3rd-party/liblmdb/midl.c",
         "src/node-binding.cpp",
         "src/kv-types.cpp",
+        "src/lmdb/setup.cpp",
         "src/lmdb/env.cpp",
         "src/lmdb/db.cpp",
         "src/lmdb/cursor.cpp",
