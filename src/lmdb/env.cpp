@@ -113,14 +113,14 @@ struct uv_env_sync {
 	uv_work_t request;
 	NanCallback* callback;
 	env *ew;
-	MDB_env *env;
+	MDB_env *dbenv;
 	int rc;
 };
 
 void sync_cb(uv_work_t *request) {
 	// Performing the sync (this will be called on a separate thread)
 	uv_env_sync *d = static_cast<uv_env_sync*>(request->data);
-	d->rc = mdb_env_sync(d->env, 1);
+	d->rc = mdb_env_sync(d->dbenv, 1);
 }
 
 void after_sync_cb(uv_work_t *request, int) {
@@ -156,7 +156,7 @@ NAN_METHOD(env::sync) {
 	uv_env_sync *d = new uv_env_sync;
 	d->request.data = d;
 	d->ew = ew;
-	d->env = ew->_env;
+	d->dbenv = ew->_env;
 	d->callback = new NanCallback(callback);
 
 	uv_queue_work(uv_default_loop(), &d->request, sync_cb, after_sync_cb);
