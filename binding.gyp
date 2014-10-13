@@ -8,7 +8,8 @@
       ],
       "sources": [
         "3rd-party/liblmdb/mdb.c",
-        "3rd-party/liblmdb/midl.c"
+        "3rd-party/liblmdb/midl.c",
+        "src/node-binding.cpp"
       ],
       "conditions": [
         [
