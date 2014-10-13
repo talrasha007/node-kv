@@ -9,18 +9,18 @@ using namespace kv::lmdb;
 
 void txn::setup_export(Handle<Object>& exports) {
 	// Prepare constructor template
-	Local<FunctionTemplate> envTpl = NanNew<FunctionTemplate>(txn::ctor);
-	envTpl->SetClassName(NanNew("Txn"));
-	envTpl->InstanceTemplate()->SetInternalFieldCount(1);
+	Local<FunctionTemplate> txnTpl = NanNew<FunctionTemplate>(txn::ctor);
+	txnTpl->SetClassName(NanNew("Txn"));
+	txnTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "commit", txn::commit);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "abort", txn::abort);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "reset", txn::reset);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "renew", txn::renew);
+	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "commit", txn::commit);
+	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "abort", txn::abort);
+	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "reset", txn::reset);
+	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "renew", txn::renew);
 
 	// Set exports
-	exports->Set(NanNew("Txn"), envTpl->GetFunction());
+	exports->Set(NanNew("Txn"), txnTpl->GetFunction());
 }
 
 NAN_METHOD(txn::ctor) {
