@@ -3,10 +3,11 @@
 
 #include "env.h"
 
+using namespace v8;
 using namespace kv;
 using namespace kv::lmdb;
 
-void env::setup_export(Handle<v8::Object> exports) {
+void env::setup_export(Handle<Object> exports) {
 	// Prepare constructor template
 	Local<FunctionTemplate> envTpl = NanNew<FunctionTemplate>(env::ctor);
 	envTpl->SetClassName(NanNew("Env"));
