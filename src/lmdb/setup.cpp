@@ -11,7 +11,7 @@
 using namespace v8;
 
 Handle<Object> kv::lmdb::v8export() {
-	Local<Object> ret;
+	Local<Object> ret = NanNew<Object>();
 
 	env::setup_export(ret);
 	txn::setup_export(ret);
