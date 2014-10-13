@@ -32,11 +32,11 @@ const char* hex_type::type_name = "hex";
 
 hex_type::hex_type(Handle<Value>& val) : _mem(NULL), _is_allocated(false) {
 	NanUtf8String utf8(val);
-	int sz = utf8.Size() / 2;
+	size_t sz = utf8.Size() / 2;
 
 	char *dest = sz > sizeof(_buf) ? (_is_allocated = true, _mem = new char[sz]) : _buf;
 
-	int cnt = 0;
+	size_t cnt = 0;
 	for (const char* cur = *utf8; cnt < sz; cur += 2, cnt++) {
 		char tmp[3] = { *cur, *(cur + 1), 0 };
 		dest[cnt] = (char)strtol(tmp, NULL, 16);
@@ -76,33 +76,35 @@ size_t hex_type::size() {
 	return _size;
 }
 
-template<> const char* number_type<double>::type_name = "number";
+namespace kv {
+	template<> const char* number_type<double>::type_name = "number";
 
-template<> number_type<double>::number_type(Handle<Value>& val) {
-	_val = val->NumberValue();
-}
+	template<> number_type<double>::number_type(Handle<Value>& val) {
+		_val = val->NumberValue();
+	}
 
-template<> const char* number_type<int32_t>::type_name = "int32";
+	template<> const char* number_type<int32_t>::type_name = "int32";
 
-template<> number_type<int32_t>::number_type(Handle<Value>& val) {
-	_val = val->Int32Value();
-}
+	template<> number_type<int32_t>::number_type(Handle<Value>& val) {
+		_val = val->Int32Value();
+	}
 
-template<> const char* number_type<uint32_t>::type_name = "uint32";
+	template<> const char* number_type<uint32_t>::type_name = "uint32";
 
-template<> number_type<uint32_t>::number_type(Handle<Value>& val) {
-	_val = val->Uint32Value();
-}
+	template<> number_type<uint32_t>::number_type(Handle<Value>& val) {
+		_val = val->Uint32Value();
+	}
 
-template<> const char* number_type<int64_t>::type_name = "int64";
+	template<> const char* number_type<int64_t>::type_name = "int64";
 
-template<> number_type<int64_t>::number_type(Handle<Value>& val) {
-	NanUtf8String utf8(val);
-	_val = atoll(*utf8);
-}
+	template<> number_type<int64_t>::number_type(Handle<Value>& val) {
+		NanUtf8String utf8(val);
+		_val = atoll(*utf8);
+	}
 
-template<> Local<Value> number_type<int64_t>::v8value() {
-	char buf[32];
-	sprintf(buf, "%d", _val);
-	return NanNew(buf);
+	template<> Local<Value> number_type<int64_t>::v8value() {
+		char buf[32];
+		sprintf(buf, "%lld", _val);
+		return NanNew(buf);
+	}
 }
