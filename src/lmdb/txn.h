@@ -6,7 +6,7 @@ namespace kv {
 	namespace lmdb {
 		class txn : public node::ObjectWrap {
 		public:
-			static void setup_export(v8::Handle<v8::Object> exports);
+			static void setup_export(v8::Handle<v8::Object>& exports);
 
 		private:
 			static NAN_METHOD(ctor);

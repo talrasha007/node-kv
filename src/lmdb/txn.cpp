@@ -7,7 +7,7 @@ using namespace v8;
 using namespace kv;
 using namespace kv::lmdb;
 
-void txn::setup_export(Handle<Object> exports) {
+void txn::setup_export(Handle<Object>& exports) {
 	// Prepare constructor template
 	Local<FunctionTemplate> envTpl = NanNew<FunctionTemplate>(txn::ctor);
 	envTpl->SetClassName(NanNew("Txn"));
