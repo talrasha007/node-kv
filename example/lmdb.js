@@ -27,9 +27,10 @@ var env = new lmdb.Env({
         valType: 'string' // or valveType
     });
 
-    db.put('你好', '世界');
-    console.log(db.get('你好'));
-    db.del('你好');
+    var txn = env.beginTxn();
+    db.put('你好', '世界', txn);
+    console.log(db.get('你好', txn));
+    txn.abort();
     console.log(db.get('你好'));
 })();
 
