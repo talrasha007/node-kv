@@ -58,7 +58,7 @@ namespace kv {
 		}
 
 		const char* data() {
-			return (const char*)_val;
+			return (const char*)&_val;
 		}
 
 		size_t size() {

@@ -92,7 +92,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::close)) {
 
 class kv::lmdb::txn_scope {
 public:
-	txn_scope(Local<Value> arg, MDB_env *env, bool readonly) : _txn(NULL), _created(false), _commit(false) {
+	txn_scope(Local<Value> arg, MDB_env *env, bool readonly = false) : _txn(NULL), _created(false), _commit(false) {
 		if (arg->IsObject()) {
 			_txn = node::ObjectWrap::Unwrap<txn>(arg->ToObject())->_txn;
 		} else {
@@ -149,7 +149,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::put)) {
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	K key = K(args[0]);
 	V val = V(args[1]);
-	txn_scope tc(args[2], dw->_env, true);
+	txn_scope tc(args[2], dw->_env);
 
 	MDB_val k, v;
 	k.mv_data = (void*)key.data();
@@ -163,6 +163,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::put)) {
 		NanReturnUndefined();
 	}
 
+	tc.commit();
 	NanReturnValue(NanNew(true));
 }
 
@@ -171,7 +172,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::del)) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	K key = K(args[0]);
-	txn_scope tc(args[1], dw->_env, true);
+	txn_scope tc(args[1], dw->_env);
 
 	MDB_val k;
 	k.mv_data = (void*)key.data();
@@ -183,6 +184,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::del)) {
 		NanReturnUndefined();
 	}
 
+	tc.commit();
 	NanReturnValue(NanNew(true));
 }
 
