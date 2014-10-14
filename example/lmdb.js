@@ -7,10 +7,16 @@ var env = new lmdb.Env({
     maxDbs: 64 // 32 by default
 });
 
-env.openDb({
+var db = env.openDb({
     name: 'test',
     keyType: 'int32',
     valType: 'int32' // or valveType
 });
+
+db.put(1, 1);
+console.log(db.get(1));
+db.del(1);
+try { db.get(1); }
+catch (e) { console.log(e); }
 
 env.close();
