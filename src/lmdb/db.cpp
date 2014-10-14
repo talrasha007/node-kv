@@ -3,6 +3,7 @@
 #include "../kv-types.h"
 
 #include "env.h"
+#include "txn.h"
 #include "db.h"
 
 using namespace v8;
@@ -25,6 +26,9 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 
 	// Add functions to the prototype
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "close", db::close);
+	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "get", db::get);
+	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "put", db::put);
+	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "del", db::del);
 	// TODO: wrap mdb_stat too
 
 	// Set exports
@@ -84,6 +88,102 @@ template <class K, class V> NAN_METHOD((db<K, V>::close)) {
 	mdb_dbi_close(dw->_env, dw->_dbi);
 
 	NanReturnUndefined();
+}
+
+class kv::lmdb::txn_scope {
+public:
+	txn_scope(Local<Value>& arg, MDB_env *env, bool readonly) : _txn(NULL), _created(false), _commit(false) {
+		if (arg->IsObject()) {
+			_txn = node::ObjectWrap::Unwrap<txn>(arg->ToObject())->_txn;
+		} else {
+			_created = true;
+			mdb_txn_begin(env, NULL, readonly ? MDB_RDONLY : 0, &_txn);
+		}
+	}
+
+	~txn_scope() {
+		if (_created) {
+			if (!_commit) mdb_txn_abort(_txn);
+			else mdb_txn_commit(_txn);
+		}
+	}
+
+	MDB_txn *operator*() {
+		return _txn;
+	}
+
+	void commit() {
+		_commit = true;
+	}
+
+private:
+	MDB_txn *_txn;
+	bool _created;
+	bool _commit;
+};
+
+template <class K, class V> NAN_METHOD((db<K, V>::get)) {
+	NanScope();
+
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	K key = K(args[0]);
+	txn_scope tc(args[1], dw->_env, true);
+
+	MDB_val k, v;
+	k.mv_data = (void*)key.data();
+	k.mv_size = key.size();
+
+	int rc = mdb_get(*tc, dw->_dbi, &k, &v);
+	if (rc != 0) {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+
+	V val((const char*)v.mv_data, v.mv_size);
+	NanReturnValue(val.v8value());
+}
+
+template <class K, class V> NAN_METHOD((db<K, V>::put)) {
+	NanScope();
+
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	K key = K(args[0]);
+	V val = V(args[1]);
+	txn_scope tc(args[2], dw->_env, true);
+
+	MDB_val k, v;
+	k.mv_data = (void*)key.data();
+	k.mv_size = key.size();
+	v.mv_data = (void*)val.data();
+	v.mv_size = val.size();
+
+	int rc = mdb_put(*tc, dw->_dbi, &k, &v, 0);
+	if (rc != 0) {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+
+	NanReturnValue(NanNew(true));
+}
+
+template <class K, class V> NAN_METHOD((db<K, V>::del)) {
+	NanScope();
+
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	K key = K(args[0]);
+	txn_scope tc(args[1], dw->_env, true);
+
+	MDB_val k;
+	k.mv_data = (void*)key.data();
+	k.mv_size = key.size();
+
+	int rc = mdb_del(*tc, dw->_dbi, &k, NULL);
+	if (rc != 0) {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+
+	NanReturnValue(NanNew(true));
 }
 
 template <class K, class V> db<K, V>::db(MDB_env* env, MDB_dbi dbi) : _dbi(dbi), _env(env) {

@@ -20,6 +20,9 @@ namespace kv {
 			txn(MDB_env *env, bool readonly);
 
 		private:
+			friend class txn_scope;
+			template <class K, class V> friend class db;
+
 			bool _readonly;
 
 			MDB_txn *_txn;

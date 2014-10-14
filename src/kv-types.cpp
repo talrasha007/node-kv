@@ -78,33 +78,7 @@ size_t hex_type::size() {
 
 namespace kv {
 	template<> const char* number_type<double>::type_name = "number";
-
-	template<> number_type<double>::number_type(Handle<Value>& val) {
-		_val = val->NumberValue();
-	}
-
 	template<> const char* number_type<int32_t>::type_name = "int32";
-
-	template<> number_type<int32_t>::number_type(Handle<Value>& val) {
-		_val = val->Int32Value();
-	}
-
 	template<> const char* number_type<uint32_t>::type_name = "uint32";
-
-	template<> number_type<uint32_t>::number_type(Handle<Value>& val) {
-		_val = val->Uint32Value();
-	}
-
 	template<> const char* number_type<int64_t>::type_name = "int64";
-
-	template<> number_type<int64_t>::number_type(Handle<Value>& val) {
-		NanUtf8String utf8(val);
-		_val = atoll(*utf8);
-	}
-
-	template<> Local<Value> number_type<int64_t>::v8value() {
-		char buf[32];
-		sprintf(buf, "%lld", (long long int)_val);
-		return NanNew(buf);
-	}
 }

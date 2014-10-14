@@ -44,6 +44,11 @@ namespace kv {
 		static const char* type_name;
 
 		number_type(v8::Handle<v8::Value>& val);
+
+		number_type(const char* val, size_t size) {
+			_val = *(NUMBER*)val;
+		}
+
 		number_type(NUMBER val = 0) : _val(val) {
 
 		}
@@ -63,6 +68,29 @@ namespace kv {
 	private:
 		NUMBER _val;
 	};
+
+	template<> inline number_type<double>::number_type(v8::Handle<v8::Value>& val) {
+		_val = val->NumberValue();
+	}
+
+	template<> inline number_type<int32_t>::number_type(v8::Handle<v8::Value>& val) {
+		_val = val->Int32Value();
+	}
+
+	template<> inline number_type<uint32_t>::number_type(v8::Handle<v8::Value>& val) {
+		_val = val->Uint32Value();
+	}
+
+	template<> inline number_type<int64_t>::number_type(v8::Handle<v8::Value>& val) {
+		NanUtf8String utf8(val);
+		_val = atoll(*utf8);
+	}
+
+	template<> inline v8::Local<v8::Value> number_type<int64_t>::v8value() {
+		char buf[32];
+		sprintf(buf, "%lld", (long long int)_val);
+		return NanNew(buf);
+	}
 }
 
 #define KV_VALTYPE_EACH(KT, EXP) \

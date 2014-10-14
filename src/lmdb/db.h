@@ -14,6 +14,9 @@ namespace kv {
 			static NAN_METHOD(ctor);
 
 			static NAN_METHOD(close);
+			static NAN_METHOD(get);
+			static NAN_METHOD(put);
+			static NAN_METHOD(del);
 
 		private:
 			db(MDB_env* env, MDB_dbi dbi);
@@ -22,5 +25,7 @@ namespace kv {
 			MDB_dbi _dbi;
 			MDB_env *_env;
 		};
+
+		class txn_scope;
 	}
 }
