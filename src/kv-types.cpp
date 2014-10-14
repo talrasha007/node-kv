@@ -5,8 +5,6 @@
 using namespace v8;
 using namespace kv;
 
-const char* binary_type::type_name = "binary";
-
 binary_type::binary_type(Handle<Value> val) {
 	_data = node::Buffer::Data(val);
 	_size = node::Buffer::Length(val);
@@ -28,7 +26,32 @@ size_t binary_type::size() {
 	return _size;
 }
 
-const char* hex_type::type_name = "hex";
+string_type::string_type(Handle<Value> val) : _is_allocated(true) {
+	Local<String> toStr = val->ToString();
+	int buf_size = toStr->Utf8Length() + 1;
+	_data = new char[buf_size];
+	_size = toStr->WriteUtf8(_data, buf_size);
+}
+
+string_type::string_type(const char* val, size_t sz) : _data((char*)val), _size(sz), _is_allocated(false) {
+
+}
+
+string_type::~string_type() {
+	if (_is_allocated) delete[] _data;
+}
+
+Local<Value> string_type::v8value() {
+	return NanNew(_data);
+}
+
+const char* string_type::data() {
+	return _data;
+}
+
+size_t string_type::size() {
+	return _size;
+}
 
 hex_type::hex_type(Handle<Value> val) : _mem(NULL), _is_allocated(false) {
 	NanUtf8String utf8(val);
@@ -77,6 +100,10 @@ size_t hex_type::size() {
 }
 
 namespace kv {
+	const char* binary_type::type_name = "binary";
+	const char* string_type::type_name = "string";
+	const char* hex_type::type_name = "hex";
+
 	template<> const char* number_type<double>::type_name = "number";
 	template<> const char* number_type<int32_t>::type_name = "int32";
 	template<> const char* number_type<uint32_t>::type_name = "uint32";

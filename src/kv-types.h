@@ -19,6 +19,24 @@ namespace kv {
 		size_t _size;
 	};
 
+	class string_type {
+	public:
+		static const char* type_name;
+
+		string_type(v8::Handle<v8::Value> val);
+		string_type(const char* val, size_t sz);
+		~string_type();
+
+		v8::Local<v8::Value> v8value();
+		const char* data();
+		size_t size();
+
+	private:
+		char* _data;
+		size_t _size;
+		bool _is_allocated;
+	};
+
 	class hex_type {
 	public:
 		static const char* type_name;
@@ -95,6 +113,7 @@ namespace kv {
 
 #define KV_VALTYPE_EACH(KT, EXP) \
 	EXP(KT, kv::binary_type)\
+	EXP(KT, kv::string_type)\
 	EXP(KT, kv::hex_type)\
 	EXP(KT, kv::number_type<int32_t>)\
 	EXP(KT, kv::number_type<uint32_t>)\
@@ -102,6 +121,7 @@ namespace kv {
 
 #define KV_TYPE_EACH(EXP) \
 	KV_VALTYPE_EACH(kv::binary_type, EXP) \
+	KV_VALTYPE_EACH(kv::string_type, EXP) \
 	KV_VALTYPE_EACH(kv::hex_type, EXP) \
 	KV_VALTYPE_EACH(kv::number_type<int32_t>, EXP) \
 	KV_VALTYPE_EACH(kv::number_type<uint32_t>, EXP) \
