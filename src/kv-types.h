@@ -83,6 +83,10 @@ namespace kv {
 			return sizeof(_val);
 		}
 
+		int compare(const number_type& o) const {
+			return _val > o._val ? 1 : _val < o._val ? -1 : 0;
+		}
+
 	private:
 		NUMBER _val;
 	};

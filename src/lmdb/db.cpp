@@ -10,6 +10,26 @@ using namespace v8;
 using namespace kv;
 using namespace kv::lmdb;
 
+template<class T> int mdb_cmp_fn(const MDB_val *a, const MDB_val *b) {
+	T ta((const char*)a->mv_data, a->mv_size), tb((const char*)b->mv_data, b->mv_size);
+	return ta.compare(tb);
+}
+
+template<class T> struct mdb_cmp_setter {
+	static void set_cmp(MDB_txn*, MDB_dbi) { }
+	static void set_dup_cmp(MDB_txn*, MDB_dbi) { }
+};
+
+template<class N> struct mdb_cmp_setter<number_type<N> > {
+	static void set_cmp(MDB_txn* txn, MDB_dbi dbi) {
+		mdb_set_compare(txn, dbi, mdb_cmp_fn<number_type<N> >);
+	}
+
+	static void set_dup_cmp(MDB_txn* txn, MDB_dbi dbi) {
+		mdb_set_dupsort(txn, dbi, mdb_cmp_fn<number_type<N> >);
+	}
+};
+
 #define DB_EXPORT(KT, VT) db<KT, VT>::setup_export(exports);
 void kv::lmdb::setup_db_export(v8::Handle<v8::Object>& exports) {
 	KV_TYPE_EACH(DB_EXPORT);
@@ -46,7 +66,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::ctor)) {
 	if (args[1]->IsObject()) {
 		Local<Object> options = args[1]->ToObject();
 		NanUtf8String name(options->Get(NanNew("name")));
-		//bool allowdup = options->Get(NanNew("allowDup"))->BooleanValue();
+		bool allowdup = options->Get(NanNew("allowDup"))->BooleanValue();
 
 		// Open transaction
 		rc = mdb_txn_begin(ew->_env, NULL, 0, &txn);
@@ -63,6 +83,10 @@ template <class K, class V> NAN_METHOD((db<K, V>::ctor)) {
 			NanThrowError(mdb_strerror(rc));
 			NanReturnUndefined();
 		}
+
+		// Set compare function.
+		mdb_cmp_setter<K>::set_cmp(txn, dbi);
+		if (allowdup) mdb_cmp_setter<V>::set_dup_cmp(txn, dbi);
 
 		// Commit transaction
 		rc = mdb_txn_commit(txn);
