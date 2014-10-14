@@ -55,7 +55,10 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 	exports->Set(NanNew(class_name), dbiTpl->GetFunction());
 }
 
-template <class K, class V> NAN_METHOD((db<K, V>::ctor)) {
+#define KVDB db<K, V>
+#define KVDB_METHOD(fn) template <class K, class V> NAN_METHOD(KVDB::fn)
+
+KVDB_METHOD(ctor) {
 	int rc = 0;
 	NanScope();
 
@@ -105,7 +108,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::ctor)) {
 	NanReturnValue(args.This());
 }
 
-template <class K, class V> NAN_METHOD((db<K, V>::close)) {
+KVDB_METHOD(close) {
 	NanScope();
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
@@ -146,7 +149,7 @@ private:
 	bool _commit;
 };
 
-template <class K, class V> NAN_METHOD((db<K, V>::get)) {
+KVDB_METHOD(get) {
 	NanScope();
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
@@ -172,7 +175,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::get)) {
 	NanReturnValue(val.v8value());
 }
 
-template <class K, class V> NAN_METHOD((db<K, V>::put)) {
+KVDB_METHOD(put) {
 	NanScope();
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
@@ -196,7 +199,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::put)) {
 	NanReturnValue(NanNew(true));
 }
 
-template <class K, class V> NAN_METHOD((db<K, V>::del)) {
+KVDB_METHOD(del) {
 	NanScope();
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
