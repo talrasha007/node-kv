@@ -29,3 +29,6 @@ node_modules
 
 # Users Environment Variables
 .lock-wscript
+
+# Test data
+testdb
