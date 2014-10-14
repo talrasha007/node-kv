@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <lmdb/lmdb.h>
 
 namespace kv {
@@ -10,9 +9,6 @@ namespace kv {
 		template <class K, class V> class db : public node::ObjectWrap {
 		public:
 			static void setup_export(v8::Handle<v8::Object>& exports);
-
-		private:
-			static std::string class_name;
 
 		private:
 			static NAN_METHOD(ctor);
