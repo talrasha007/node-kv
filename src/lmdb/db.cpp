@@ -158,6 +158,11 @@ template <class K, class V> NAN_METHOD((db<K, V>::get)) {
 	k.mv_size = key.size();
 
 	int rc = mdb_get(*tc, dw->_dbi, &k, &v);
+
+	if (rc == MDB_NOTFOUND) {
+		NanReturnNull();
+	}
+
 	if (rc != 0) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
