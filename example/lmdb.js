@@ -16,7 +16,6 @@ var db = env.openDb({
 db.put(1, 1);
 console.log(db.get(1));
 db.del(1);
-try { db.get(1); }
-catch (e) { console.log(e); }
+console.log(db.get(1));
 
 env.close();
