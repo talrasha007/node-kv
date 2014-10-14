@@ -131,3 +131,10 @@ NAN_METHOD(txn::renew) {
 txn::txn(MDB_env* env, bool readonly) : _readonly(readonly), _txn(NULL), _env(env) {
 
 }
+
+txn::~txn() {
+	if (_txn) {
+		printf("LMDB_txn warning: unclosed txn aborted by dtor.");
+		mdb_txn_abort(_txn);
+	}
+}

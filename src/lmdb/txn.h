@@ -18,6 +18,7 @@ namespace kv {
 
 		private:
 			txn(MDB_env *env, bool readonly);
+			~txn();
 
 		private:
 			friend class txn_scope;
