@@ -7,7 +7,7 @@ using namespace kv;
 
 const char* binary_type::type_name = "binary";
 
-binary_type::binary_type(Handle<Value>& val) {
+binary_type::binary_type(Handle<Value> val) {
 	_data = node::Buffer::Data(val);
 	_size = node::Buffer::Length(val);
 }
@@ -30,7 +30,7 @@ size_t binary_type::size() {
 
 const char* hex_type::type_name = "hex";
 
-hex_type::hex_type(Handle<Value>& val) : _mem(NULL), _is_allocated(false) {
+hex_type::hex_type(Handle<Value> val) : _mem(NULL), _is_allocated(false) {
 	NanUtf8String utf8(val);
 	size_t sz = utf8.Size() / 2;
 

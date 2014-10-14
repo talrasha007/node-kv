@@ -7,7 +7,7 @@ namespace kv {
 	public:
 		static const char* type_name;
 
-		binary_type(v8::Handle<v8::Value>& val);
+		binary_type(v8::Handle<v8::Value> val);
 		binary_type(const char* val, size_t sz);
 
 		v8::Local<v8::Value> v8value();
@@ -23,7 +23,7 @@ namespace kv {
 	public:
 		static const char* type_name;
 
-		hex_type(v8::Handle<v8::Value>& val);
+		hex_type(v8::Handle<v8::Value> val);
 		hex_type(const char* val, size_t sz);
 		~hex_type();
 
@@ -43,7 +43,7 @@ namespace kv {
 	public:
 		static const char* type_name;
 
-		number_type(v8::Handle<v8::Value>& val);
+		number_type(v8::Handle<v8::Value> val);
 
 		number_type(const char* val, size_t size) {
 			_val = *(NUMBER*)val;
@@ -69,19 +69,19 @@ namespace kv {
 		NUMBER _val;
 	};
 
-	template<> inline number_type<double>::number_type(v8::Handle<v8::Value>& val) {
+	template<> inline number_type<double>::number_type(v8::Handle<v8::Value> val) {
 		_val = val->NumberValue();
 	}
 
-	template<> inline number_type<int32_t>::number_type(v8::Handle<v8::Value>& val) {
+	template<> inline number_type<int32_t>::number_type(v8::Handle<v8::Value> val) {
 		_val = val->Int32Value();
 	}
 
-	template<> inline number_type<uint32_t>::number_type(v8::Handle<v8::Value>& val) {
+	template<> inline number_type<uint32_t>::number_type(v8::Handle<v8::Value> val) {
 		_val = val->Uint32Value();
 	}
 
-	template<> inline number_type<int64_t>::number_type(v8::Handle<v8::Value>& val) {
+	template<> inline number_type<int64_t>::number_type(v8::Handle<v8::Value> val) {
 		NanUtf8String utf8(val);
 		_val = atoll(*utf8);
 	}

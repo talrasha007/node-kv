@@ -92,7 +92,7 @@ template <class K, class V> NAN_METHOD((db<K, V>::close)) {
 
 class kv::lmdb::txn_scope {
 public:
-	txn_scope(Local<Value>& arg, MDB_env *env, bool readonly) : _txn(NULL), _created(false), _commit(false) {
+	txn_scope(Local<Value> arg, MDB_env *env, bool readonly) : _txn(NULL), _created(false), _commit(false) {
 		if (arg->IsObject()) {
 			_txn = node::ObjectWrap::Unwrap<txn>(arg->ToObject())->_txn;
 		} else {
