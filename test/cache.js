@@ -7,34 +7,54 @@ var path = require('path'),
 var envPath = path.join(__dirname, 'testdb', 'cache');
 
 describe('Cache', function () {
-    it('should create folders as expected.', function (fcb) {
+//    it('should create folders as expected.', function (fcb) {
+//        try { rmdir(envPath); } catch (e) { }
+//
+//        var ch = new cache.Env({ dir: envPath });
+//        expect(fs.readdirSync(envPath)).to.eql(['1', '2']);
+//
+//        ch._rotate();
+//        expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3']);
+//
+//        ch._rotate();
+//        expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3', '4']);
+//
+//        setTimeout(function () {
+//            ch.rmStale();
+//            expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4']);
+//
+//            ch._rotate();
+//            ch._rotate();
+//            expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4', '5', '6']);
+//
+//            setTimeout(function () {
+//                ch.rmStale();
+//                expect(fs.readdirSync(envPath)).to.eql(['4', '5', '6']);
+//
+//                ch.close(fcb);
+//            }, 100);
+//        }, 100);
+//    });
+
+    it('should work as expected.', function () {
         try { rmdir(envPath); } catch (e) { }
 
-        var ch = new cache.Env({ dir: envPath });
+        var ch = new cache.Env({ dir: envPath, cacheSize: 1024 * 64 });
         expect(fs.readdirSync(envPath)).to.eql(['1', '2']);
 
-        ch._rotate();
+        var cdb = ch.openDb({
+            name: 'test',
+            keyType: 'int32',
+            valType: 'binary'
+        });
+
+        var key = 0, val = new Buffer(1024);
+        cdb.put(key++, val);
+        cdb.put(key++, val);
+        for (var i = 0; i < key; i++) {
+            expect(Buffer.isBuffer(cdb.get(i))).to.be(true);
+        }
+        expect(cdb.get(3)).to.be(null);
         expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3']);
-
-        ch._rotate();
-        expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3', '4']);
-
-        setTimeout(function () {
-            ch.rmStale();
-            expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4']);
-
-            ch._rotate();
-            ch._rotate();
-            expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4', '5', '6']);
-
-            setTimeout(function () {
-                ch.rmStale();
-                expect(fs.readdirSync(envPath)).to.eql(['4', '5', '6']);
-
-                ch.close();
-                fcb();
-            }, 100);
-        }, 100);
-
     });
 });
