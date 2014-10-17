@@ -30,6 +30,8 @@ describe('Cache', function () {
             setTimeout(function () {
                 ch.rmStale();
                 expect(fs.readdirSync(envPath)).to.eql(['4', '5', '6']);
+
+                ch.close();
                 fcb();
             }, 100);
         }, 100);
