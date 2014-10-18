@@ -1,8 +1,11 @@
 var path = require('path'),
     lmdb = require('../').lmdb;
 
+var envPath = path.join(__dirname, 'testdb');
+require('../lib/rmdir.js')(envPath);
+
 var env = new lmdb.Env({
-    dir: path.join(__dirname, 'testdb')
+    dir: envPath
 });
 
 var dbI32 = env.openDb({
@@ -35,33 +38,38 @@ suite('LMDB', function () {
     });
 });
 
-suite('LMDB_Batch_put', function () {
-    var txn;
-    before(function () {
-        txn = env.beginTxn();
-        txn.cnt = 0;
-    });
+function defineBatch(bsize) {
+    suite('LMDB_Batch_seq_' + bsize, function () {
+        var i = 0;
 
-    function batchPutBench(sz) {
-        bench('int32put_batch' + sz, function () {
-            dbI32.put(Math.random() * 5000000, Math.random() * 5000000, txn);
-            txn.cnt++;
-            if (txn.cnt >= sz) {
-                txn.cnt = 0;
-                txn.commit();
-                txn.renew();
-            }
+        before(function () {
+            env.setBatchSize(bsize);
         });
-    }
 
-    batchPutBench(10);
-    batchPutBench(50);
-    batchPutBench(100);
-
-    after(function() {
-        txn.commit();
+        bench('put', function () { dbI32.batchPut(i++, i); });
+        bench('del', function () { dbI32.batchDel(--i); });
     });
-});
+}
+
+defineBatch(10);
+defineBatch(64);
+defineBatch(128);
+defineBatch(256);
+
+function defineRandomBatch(bsize) {
+    suite('LMDB_Batch_random_' + bsize, function () {
+        before(function () {
+            env.setBatchSize(bsize);
+        });
+
+        bench('put', function () { dbI32.batchPut(Math.random() * 5 * 1024 * 1024, 1); });
+    });
+}
+
+defineRandomBatch(10);
+defineRandomBatch(64);
+defineRandomBatch(128);
+defineRandomBatch(256);
 
 suite('LMDB_Batch_get', function () {
     var rtxn;
