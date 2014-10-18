@@ -211,6 +211,11 @@ KVDB_METHOD(del) {
 	k.mv_size = key.size();
 
 	int rc = mdb_del(*tc, dw->_dbi, &k, NULL);
+
+	if (rc == MDB_NOTFOUND) {
+		NanReturnValue(NanNew(false));
+	}
+
 	if (rc != 0) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
