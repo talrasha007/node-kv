@@ -2,7 +2,7 @@ var path = require('path'),
     lmdb = require('../').lmdb;
 
 var envPath = path.join(__dirname, 'testdb');
-require('../lib/rmdir.js')(envPath);
+try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
 var env = new lmdb.Env({
     dir: envPath
