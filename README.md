@@ -49,6 +49,7 @@ db.del(1);
 console.log(db.get(1));
 
 // Batch
+env.onfull = function () { console.log('LMDV env is full.'); } // When you use batch ops, remember to set this callback to catch MDB_MAPFULL exception.
 db.batchPut(5, 1);
 db.batchPut(4, 1);
 env.flushBatchOps(); // If you want to query the data immediately, do this.

@@ -48,6 +48,7 @@ db.del(1);
 console.log(db.get(1));
 
 // Batch
+env.onfull = function () { console.log('LMDV env is full.'); } // 使用batch时，记得把这个callback给设上。
 db.batchPut(5, 1);
 db.batchPut(4, 1);
 env.flushBatchOps(); // If you want to query the data immediately, do this.
