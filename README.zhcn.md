@@ -3,9 +3,24 @@ node-kv
 
 一个嵌入式的kv存储引擎，特点就是灰常快。
 
+# 特性
+- 多个kv引擎的支持(LMDB/LevelDB/RocksDB，那个，现在只有LMDB先。)
+- 高速
+- 方便
+- 即将支持bit-vector运算，会是做bitmap index的一个不错的选择。
+
 # 安装
 ```
 npm install node-kv
+```
+
+# Test & Benchmark
+```
+git clone https://github.com/talrasha007/node-kv.git
+npm install
+npm install -g matcha mocha
+mocha   # Run unit test.
+matcha  # Run benchmark.
 ```
 
 # 用法
@@ -14,7 +29,7 @@ npm install node-kv
 ```js
 var path = require('path'),
     lmdb = require('node-kv').lmdb;
-    
+
 var env = new lmdb.Env({
     dir: path.join(__dirname, 'testdb'),
     mapSize: 8 * 1024 * 1024, // 128M by default
@@ -32,6 +47,13 @@ console.log(db.get(1));
 db.del(1);
 console.log(db.get(1));
 
+// Batch
+db.batchPut(5, 1);
+db.batchPut(4, 1);
+env.flushBatchOps(); // If you want to query the data immediately, do this.
+console.log(db.get(4));
+
+// Txn
 var txn = env.beginTxn();
 db.put(1, 1, txn);
 db.get(1, txn);
