@@ -25,7 +25,39 @@ matcha  # Run benchmark.
 
 # 用法
 
-### LMDB
+### - Cache
+```js
+// This example shows how to use cache apis.
+// 这东东是用来做热数据缓存用的，它是一个lmdb的封装，内有两个lmdb env（一个当前，一个旧），
+// 当前的满了后，会把旧的env关掉，把当前的设置成旧的，然后新开一个lmdb env做为当前。
+var path = require('path'),
+    cache = require('../').cache;
+
+var cenv = new cache.Env({
+    dir: path.join(__dirname, 'testdb', 'cache'),
+    cacheSize: 128 * 1024 * 1024,   // 256M by default
+    batchSize: 128                  // 64 by default
+});
+
+var cdb = cenv.openDb({
+    name: 'testdb',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+cdb.put(1, 2);
+cdb.put(2, 3);
+cenv.flushBatchOps(); // Data will flushed automatically after 1ms, if you want to query immediately, do this.
+console.log(cdb.get(1));
+
+cdb.put(3, 3);
+setTimeout(function () {
+    console.log(cdb.get(3));
+    cenv.close();
+}, 50);
+```
+
+### - LMDB
 ```js
 var path = require('path'),
     lmdb = require('node-kv').lmdb;
@@ -61,5 +93,5 @@ db.get(1, txn);
 txn.commit();
 ```
 
-### LevelDB
+### - LevelDB
 即将支持

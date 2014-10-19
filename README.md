@@ -26,8 +26,42 @@ matcha  # Run benchmark.
 ```
 
 ## Usage
+
+### - Cache
+```js
+// This example shows how to use cache apis.
+// Cache is used for caching hot data, it is a wrapper of lmdb, it holds 2 lmdb envs(current & old), when current env is full,
+// it will close old env, set current env as old, and then open a new env as current.
+var path = require('path'),
+    cache = require('../').cache;
+
+var cenv = new cache.Env({
+    dir: path.join(__dirname, 'testdb', 'cache'),
+    cacheSize: 128 * 1024 * 1024,   // 256M by default
+    batchSize: 128                  // 64 by default
+});
+
+var cdb = cenv.openDb({
+    name: 'testdb',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+cdb.put(1, 2);
+cdb.put(2, 3);
+cenv.flushBatchOps(); // Data will flushed automatically after 1ms, if you want to query immediately, do this.
+console.log(cdb.get(1));
+
+cdb.put(3, 3);
+setTimeout(function () {
+    console.log(cdb.get(3));
+    cenv.close();
+}, 50);
+```
+
 ### - LMDB
 ```js
+// This example shows how to use lmdb apis.
 var path = require('path'),
     lmdb = require('node-kv').lmdb;
 
@@ -61,5 +95,6 @@ db.put(1, 1, txn);
 db.get(1, txn);
 txn.commit();
 ```
+
 ### - LevelDB
   - Comming soon.
