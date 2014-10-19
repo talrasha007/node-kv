@@ -52,19 +52,28 @@ describe('Cache', function () {
         cdb.put(key++, val);
         cdb.put(key++, val);
 
-        setTimeout(function () {
-            for (var i = 0; i < key; i++) {
-                expect(Buffer.isBuffer(cdb.get(i))).to.be(true);
-            }
-            expect(cdb.get(2)).to.be(null);
+        ch.flushBatchOps();
+        for (var i = 0; i < key; i++) {
+            expect(Buffer.isBuffer(cdb.get(i))).to.be(true);
+        }
+        expect(cdb.get(2)).to.be(null);
 
-            cdb.put(key++, val);
-            setTimeout(function () {
-                expect(Buffer.isBuffer(cdb.get(2))).to.be(true);
-                expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3']);
+        cdb.put(key++, val);
+        ch.flushBatchOps();
+        expect(Buffer.isBuffer(cdb.get(2))).to.be(true);
+        expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3']);
 
-                ch.close(fcb);
-            }, 50);
-        }, 50);
+        cdb.put(key++, val);
+        ch.flushBatchOps();
+        expect(Buffer.isBuffer(cdb.get(0))).to.be(false);
+        expect(Buffer.isBuffer(cdb.get(1))).to.be(false);
+        expect(Buffer.isBuffer(cdb.get(2))).to.be(true);
+        expect(Buffer.isBuffer(cdb.get(3))).to.be(true);
+        expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3', '4']);
+
+        ch.rmStale();
+        expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4']);
+
+        ch.close(fcb);
     });
 });

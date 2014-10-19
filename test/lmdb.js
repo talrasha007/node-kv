@@ -5,11 +5,11 @@ var path = require('path'),
 var envPath = path.join(__dirname, 'testdb');
 try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
-var env = new lmdb.Env({
-    dir: envPath
-});
-
 describe('LMDB int32-int32', function () {
+    var env = new lmdb.Env({
+        dir: envPath
+    });
+
     var db = env.openDb({
         name: 'test',
         keyType: 'int32',
@@ -62,5 +62,9 @@ describe('LMDB int32-int32', function () {
         expect(db.get(2, txn)).to.be(2);
         txn.commit();
         expect(db.get(2)).to.be(2);
+    });
+
+    after(function () {
+        env.close();
     });
 });
