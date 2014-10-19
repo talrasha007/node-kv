@@ -2,8 +2,11 @@ var path = require('path'),
     expect = require('expect.js'),
     lmdb = require('../').lmdb;
 
+var envPath = path.join(__dirname, 'testdb');
+try { require('../lib/rmdir.js')(envPath); } catch (e) { }
+
 var env = new lmdb.Env({
-    dir: path.join(__dirname, 'testdb')
+    dir: envPath
 });
 
 describe('LMDB int32-int32', function () {
@@ -22,9 +25,25 @@ describe('LMDB int32-int32', function () {
     it('should work as expected.', function () {
         db.put(1, 1);
         expect(db.get(1)).to.be(1);
-        db.del(1);
+        expect(db.del(1)).to.be(true);
         expect(db.get(1)).to.be(null);
-        expect(function () { db.del(1); }).to.throwException();
+        expect(db.del(1)).to.be(false);
+    });
+
+    it('batch should work as expected.', function (fcb) {
+        db.batchPut(6, 6);
+        db.batchPut(7, 7);
+        db.batchDel(7);
+        expect(db.get(6)).to.be(null);
+        expect(db.get(7)).to.be(null);
+        env.flushBatchOps();
+        expect(db.get(6)).to.be(6);
+        expect(db.get(7)).to.be(null);
+        db.batchPut(7, 7);
+        setTimeout(function () {
+            expect(db.get(7)).to.be(7);
+            fcb();
+        }, 50);
     });
 
     it('txn should work as expected.', function () {

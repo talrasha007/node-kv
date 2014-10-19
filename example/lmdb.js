@@ -18,6 +18,11 @@ var env = new lmdb.Env({
     console.log(db.get(1));
     db.del(1);
     console.log(db.get(1));
+
+    db.batchPut(6, 6);
+    console.log(db.get(6));
+    env.flushBatchOps();
+    console.log(db.get(6));
 })();
 
 (function () {
