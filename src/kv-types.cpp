@@ -61,7 +61,7 @@ hex_type::hex_type(Handle<Value> val) : _mem(NULL), _is_allocated(false) {
 
 	size_t cnt = 0;
 	for (const char* cur = *utf8; cnt < sz; cur += 2, cnt++) {
-		char tmp[3] = { *cur, *(cur + 1), 0 };
+		char tmp[3] = { *cur, *(cur + 1) ? *(cur + 1) : '0', 0 };
 		dest[cnt] = (char)strtol(tmp, NULL, 16);
 	}
 
