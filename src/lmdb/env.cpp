@@ -106,6 +106,9 @@ NAN_METHOD(env::close) {
 		NanReturnUndefined();
 	}
 
+	if (ew->_read_lock) mdb_txn_abort(ew->_read_lock);
+	ew->_read_lock = NULL;
+
 	mdb_env_close(ew->_env);
 	ew->_env = NULL;
 
@@ -167,6 +170,25 @@ NAN_METHOD(env::sync) {
 	NanReturnUndefined();
 }
 
-env::env() : _env(NULL) {
+env::env() : _env(NULL), _read_lock(NULL) {
 
+}
+
+env::~env() {
+	if (_read_lock) mdb_txn_abort(_read_lock);
+	if (_env) mdb_env_close(_env);
+}
+
+MDB_txn* env::require_readlock() {
+	if (_read_lock) {
+		mdb_txn_renew(_read_lock);
+	} else {
+		mdb_txn_begin(_env, NULL, MDB_RDONLY, &_read_lock);
+	}
+
+	return _read_lock;
+}
+
+void env::release_readlock() {
+	mdb_txn_reset(_read_lock);
 }

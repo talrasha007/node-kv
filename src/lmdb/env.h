@@ -20,11 +20,17 @@ namespace kv {
 
 		private:
 			env();
+			~env();
+
+		public:
+			MDB_txn* require_readlock();
+			void release_readlock();
 
 		private:
 			friend class txn;
 			template <class K, class V> friend class db;
 			MDB_env *_env;
+			MDB_txn *_read_lock;
 		};
 	}
 }

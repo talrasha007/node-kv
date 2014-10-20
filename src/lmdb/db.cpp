@@ -103,7 +103,7 @@ KVDB_METHOD(ctor) {
 		NanReturnUndefined();
 	}
 
-	db* ptr = new db(ew->_env, dbi);
+	db* ptr = new db(ew, dbi);
 	ptr->Wrap(args.This());
 	NanReturnValue(args.This());
 }
@@ -112,26 +112,40 @@ KVDB_METHOD(close) {
 	NanScope();
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
-	mdb_dbi_close(dw->_env, dw->_dbi);
+	mdb_dbi_close(dw->_env->_env, dw->_dbi);
 
 	NanReturnUndefined();
 }
 
 class kv::lmdb::txn_scope {
 public:
-	txn_scope(Local<Value> arg, MDB_env *env, bool readonly = false) : _txn(NULL), _created(false), _commit(false) {
+	txn_scope(Local<Value> arg, MDB_env *env) : _env(NULL), _txn(NULL), _readonly(false), _created(false), _commit(false) {
 		if (arg->IsObject()) {
 			_txn = node::ObjectWrap::Unwrap<txn>(arg->ToObject())->_txn;
 		} else {
 			_created = true;
-			mdb_txn_begin(env, NULL, readonly ? MDB_RDONLY : 0, &_txn);
+			mdb_txn_begin(env, NULL, 0, &_txn);
+		}
+	}
+
+	txn_scope(Local<Value> arg, env *env) : _env(env), _txn(NULL), _readonly(true), _created(false), _commit(false) {
+		if (arg->IsObject()) {
+			_txn = node::ObjectWrap::Unwrap<txn>(arg->ToObject())->_txn;
+		}
+		else {
+			_created = true;
+			_txn = env->require_readlock();
 		}
 	}
 
 	~txn_scope() {
 		if (_created) {
-			if (!_commit) mdb_txn_abort(_txn);
-			else mdb_txn_commit(_txn);
+			if (_readonly) {
+				_env->release_readlock();
+			} else {
+				if (!_commit) mdb_txn_abort(_txn);
+				else mdb_txn_commit(_txn);
+			}
 		}
 	}
 
@@ -144,7 +158,9 @@ public:
 	}
 
 private:
+	env* _env;
 	MDB_txn *_txn;
+	bool _readonly;
 	bool _created;
 	bool _commit;
 };
@@ -154,7 +170,7 @@ KVDB_METHOD(get) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	K key = K(args[0]);
-	txn_scope tc(args[1], dw->_env, true);
+	txn_scope tc(args[1], dw->_env);
 
 	MDB_val k, v;
 	k.mv_data = (void*)key.data();
@@ -181,7 +197,7 @@ KVDB_METHOD(put) {
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	K key = K(args[0]);
 	V val = V(args[1]);
-	txn_scope tc(args[2], dw->_env);
+	txn_scope tc(args[2], dw->_env->_env);
 
 	MDB_val k, v;
 	k.mv_data = (void*)key.data();
@@ -204,7 +220,7 @@ KVDB_METHOD(del) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	K key = K(args[0]);
-	txn_scope tc(args[1], dw->_env);
+	txn_scope tc(args[1], dw->_env->_env);
 
 	MDB_val k;
 	k.mv_data = (void*)key.data();
@@ -225,6 +241,6 @@ KVDB_METHOD(del) {
 	NanReturnValue(NanNew(true));
 }
 
-template <class K, class V> db<K, V>::db(MDB_env* env, MDB_dbi dbi) : _dbi(dbi), _env(env) {
+template <class K, class V> db<K, V>::db(env* env, MDB_dbi dbi) : _dbi(dbi), _env(env) {
 
 }

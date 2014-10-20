@@ -71,9 +71,11 @@ describe('Cache', function () {
         expect(Buffer.isBuffer(cdb.get(3))).to.be(true);
         expect(fs.readdirSync(envPath)).to.eql(['1', '2', '3', '4']);
 
-        ch.rmStale();
-        expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4']);
+        setTimeout(function () {
+            ch.rmStale();
+            expect(fs.readdirSync(envPath)).to.eql(['2', '3', '4']);
 
-        ch.close(fcb);
+            ch.close(fcb);
+        }, 50);
     });
 });

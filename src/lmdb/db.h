@@ -4,6 +4,7 @@
 
 namespace kv {
 	namespace lmdb {
+		class env;
 		void setup_db_export(v8::Handle<v8::Object>& exports);
 
 		template <class K, class V> class db : public node::ObjectWrap {
@@ -22,11 +23,11 @@ namespace kv {
 			static NAN_METHOD(del);
 
 		private:
-			db(MDB_env* env, MDB_dbi dbi);
+			db(env* env, MDB_dbi dbi);
 
 		private:
 			MDB_dbi _dbi;
-			MDB_env *_env;
+			env *_env;
 		};
 
 		class txn_scope;
