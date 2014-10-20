@@ -71,7 +71,7 @@ defineRandomBatch(64);
 defineRandomBatch(128);
 defineRandomBatch(256);
 
-suite('LMDB_Batch_get', function () {
+suite('LMDB_readonly_txn_get', function () {
     var rtxn;
 
     before(function () {
