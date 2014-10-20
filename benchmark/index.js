@@ -14,6 +14,13 @@ var dbI32 = env.openDb({
     valType: 'int32' // or valveType
 });
 
+var dbI32Dup = env.openDb({
+    name: 'testI32Dup',
+    keyType: 'int32',
+    valType: 'int32',
+    allowDup: true
+});
+
 var dbString = env.openDb({
     name: 'testString',
     keyType: 'string',
@@ -27,6 +34,14 @@ suite('LMDB', function () {
 
     bench('int32get', function () {
         dbI32.get(Math.random() * 5000000);
+    });
+
+    bench('int32Dup_put', function () {
+        dbI32Dup.put(Math.random() * 5000000, Math.random() * 5000000);
+    });
+
+    bench('int32Dup_exists', function () {
+        dbI32Dup.exists(Math.random() * 5000000, Math.random() * 5000000);
     });
 
     bench('string_put', function () {

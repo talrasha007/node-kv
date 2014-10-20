@@ -39,4 +39,20 @@ var env = new lmdb.Env({
     console.log(db.get('你好'));
 })();
 
+(function () {
+    var db = env.openDb({
+        name: 'testdup',
+        keyType: 'int32',
+        valType: 'int32',
+        allowDup: true
+    });
+
+    db.put(1, 1);
+    console.log(db.exists(1, 1));
+    console.log(db.exists(1, 2));
+    db.put(1, 2);
+    console.log(db.exists(1, 1));
+    console.log(db.exists(1, 2));
+})();
+
 env.close();

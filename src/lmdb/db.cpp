@@ -49,6 +49,7 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "get", db::get);
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "put", db::put);
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "del", db::del);
+	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "exists", db::exists);
 	// TODO: wrap mdb_stat too
 
 	// Set exports
@@ -80,7 +81,7 @@ KVDB_METHOD(ctor) {
 		}
 
 		// Open database
-		rc = mdb_dbi_open(txn, *name, MDB_CREATE, &dbi);
+		rc = mdb_dbi_open(txn, *name, allowdup ? MDB_CREATE | MDB_DUPSORT : MDB_CREATE, &dbi);
 		if (rc != 0) {
 			mdb_txn_abort(txn);
 			NanThrowError(mdb_strerror(rc));
@@ -113,6 +114,11 @@ KVDB_METHOD(close) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 	mdb_dbi_close(dw->_env->_env, dw->_dbi);
+
+	if (dw->_cur) {
+		mdb_cursor_close(dw->_cur);
+		dw->_cur = NULL;
+	}
 
 	NanReturnUndefined();
 }
@@ -241,6 +247,39 @@ KVDB_METHOD(del) {
 	NanReturnValue(NanNew(true));
 }
 
-template <class K, class V> db<K, V>::db(env* env, MDB_dbi dbi) : _dbi(dbi), _env(env) {
+KVDB_METHOD(exists) {
+	NanScope();
 
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	K key = K(args[0]);
+	V val = V(args[1]);
+
+	MDB_val k, v;
+	k.mv_data = (void*)key.data();
+	k.mv_size = key.size();
+	v.mv_data = (void*)val.data();
+	v.mv_size = val.size();
+
+	txn_scope tc(args[2], dw->_env);
+	if (!dw->_cur) mdb_cursor_open(*tc, dw->_dbi, &dw->_cur);
+	else mdb_cursor_renew(*tc, dw->_cur);
+
+	int rc = mdb_cursor_get(dw->_cur, &k, &v, MDB_GET_BOTH);
+
+	if (rc == MDB_NOTFOUND) {
+		NanReturnValue(NanNew(false));
+	} else if (rc == 0) {
+		NanReturnValue(NanNew(true));
+	} else {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+}
+
+template <class K, class V> db<K, V>::db(env* env, MDB_dbi dbi) : _dbi(dbi), _env(env), _cur(NULL) {
+
+}
+
+template <class K, class V> db<K, V>::~db() {
+	if (_cur) mdb_cursor_close(_cur);
 }

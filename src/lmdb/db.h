@@ -22,12 +22,16 @@ namespace kv {
 			static NAN_METHOD(put);
 			static NAN_METHOD(del);
 
+			static NAN_METHOD(exists);
+
 		private:
 			db(env* env, MDB_dbi dbi);
+			~db();
 
 		private:
 			MDB_dbi _dbi;
 			env *_env;
+			MDB_cursor *_cur;
 		};
 
 		class txn_scope;
