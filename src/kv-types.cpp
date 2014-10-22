@@ -55,7 +55,7 @@ size_t string_type::size() {
 
 hex_type::hex_type(Handle<Value> val) : _mem(NULL), _is_allocated(false) {
 	NanUtf8String utf8(val);
-	size_t sz = utf8.Size() / 2;
+	size_t sz = (utf8.Size() + 1) / 2;
 
 	char *dest = sz > sizeof(_buf) ? (_is_allocated = true, _mem = new char[sz]) : _buf;
 
