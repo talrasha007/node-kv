@@ -83,7 +83,7 @@ Local<Value> hex_type::v8value() {
 
 	char *cur = dest;
 	for (size_t i = 0; i < _size; i++) {
-		sprintf(cur, "%02hhx", src[i]);
+		sprintf(cur, "%02hhx", (uint8_t)src[i]);
 		cur += 2;
 	}
 
