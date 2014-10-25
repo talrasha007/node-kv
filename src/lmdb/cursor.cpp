@@ -94,7 +94,9 @@ template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::curso
 
 	MDB_val key = { 0, 0 }, data = { 0, 0 };
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, OP);
-	if (rc != 0) {
+	if (rc == MDB_NOTFOUND) {
+		NanReturnNull();
+	} if (rc != 0) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
@@ -125,7 +127,7 @@ template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::curso
 	}
 
 	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, args[0]);
+	ret->Set(0, K((const char*)key.mv_data, key.mv_size).v8value());
 	ret->Set(1, V((const char*)data.mv_data, data.mv_size).v8value());
 	NanReturnValue(ret);
 }
@@ -182,5 +184,8 @@ template <class K, class V> cursor<K, V>::cursor(MDB_cursor *cur) : _cursor(cur)
 }
 
 template <class K, class V> cursor<K, V>::~cursor() {
-	if (_cursor) mdb_cursor_close(_cursor);
+	if (_cursor) {
+		printf("LMDB_cursor warning: unclosed cursor closed by dtor.\n");
+		mdb_cursor_close(_cursor);
+	}
 }
