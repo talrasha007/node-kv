@@ -55,7 +55,7 @@ size_t string_type::size() {
 
 hex_type::hex_type(Handle<Value> val) : _mem(NULL), _is_allocated(false) {
 	NanUtf8String utf8(val);
-	size_t sz = (utf8.Size() + 1) / 2;
+	size_t sz = utf8.Size() / 2;
 
 	char *dest = sz > sizeof(_buf) ? (_is_allocated = true, _mem = new char[sz]) : _buf;
 
@@ -78,12 +78,13 @@ hex_type::~hex_type() {
 
 Local<Value> hex_type::v8value() {
 	char buf[1025];
-	char* dest = _size > sizeof(buf) / 2 ? new char[_size * 2] : buf;
-	char* src = _mem ? _mem : _buf;
+	char *dest = _size > sizeof(buf) / 2 ? new char[_size * 2] : buf;
+	char *src = _mem ? _mem : _buf;
 
+	char *cur = dest;
 	for (size_t i = 0; i < _size; i++) {
-		sprintf(dest, "%02hhx", src[i]);
-		dest += 2;
+		sprintf(cur, "%02hhx", src[i]);
+		cur += 2;
 	}
 
 	Local<String> ret = NanNew(dest);
