@@ -88,7 +88,6 @@ extern int cacheflush(char *addr, int nbytes, int cache);
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 #if defined(__sun)
 /* Most platforms have posix_memalign, older may only have memalign */
@@ -109,11 +108,14 @@ extern int cacheflush(char *addr, int nbytes, int cache);
 #endif
 
 #ifndef _WIN32
+#include <unistd.h>
 #include <pthread.h>
 #ifdef MDB_USE_POSIX_SEM
 # define MDB_USE_HASH		1
 #include <semaphore.h>
 #endif
+#else
+typedef SSIZE_T ssize_t;
 #endif
 
 #ifdef USE_VALGRIND
@@ -221,7 +223,7 @@ extern int cacheflush(char *addr, int nbytes, int cache);
 #define pthread_mutex_lock(x)	WaitForSingleObject(*x, INFINITE)
 #define pthread_cond_signal(x)	SetEvent(*x)
 #define pthread_cond_wait(cond,mutex)	do{SignalObjectAndWait(*mutex, *cond, INFINITE, FALSE); WaitForSingleObject(*mutex, INFINITE);}while(0)
-#define THREAD_CREATE(thr,start,arg)	thr=CreateThread(NULL,0,start,arg,0,NULL)
+#define THREAD_CREATE(thr,start,arg)	thr=_beginthread(NULL,0,start,arg,0,NULL)
 #define THREAD_FINISH(thr)	WaitForSingleObject(thr, INFINITE)
 #define LOCK_MUTEX_R(env)	pthread_mutex_lock(&(env)->me_rmutex)
 #define UNLOCK_MUTEX_R(env)	pthread_mutex_unlock(&(env)->me_rmutex)
