@@ -155,6 +155,14 @@ public:
 		}
 	}
 
+	bool is_readonly() {
+		return _readonly;
+	}
+
+	bool is_created() {
+		return _created;
+	}
+
 	MDB_txn *operator*() {
 		return _txn;
 	}
@@ -261,10 +269,19 @@ KVDB_METHOD(exists) {
 	v.mv_size = val.size();
 
 	txn_scope tc(args[2], dw->_env);
-	if (!dw->_cur) mdb_cursor_open(*tc, dw->_dbi, &dw->_cur);
-	else mdb_cursor_renew(*tc, dw->_cur);
+	MDB_cursor *cur = NULL;
+	if (tc.is_created()) {
+		if (!dw->_cur) mdb_cursor_open(*tc, dw->_dbi, &dw->_cur);
+		else mdb_cursor_renew(*tc, dw->_cur);
+		cur = dw->_cur;
+	} else {
+		mdb_cursor_open(*tc, dw->_dbi, &cur);
+	}
 
-	int rc = mdb_cursor_get(dw->_cur, &k, &v, MDB_GET_BOTH);
+	int rc = mdb_cursor_get(cur, &k, &v, MDB_GET_BOTH);
+	if (!tc.is_created()) {
+		mdb_cursor_close(cur);
+	}
 
 	if (rc == MDB_NOTFOUND) {
 		NanReturnValue(NanNew(false));

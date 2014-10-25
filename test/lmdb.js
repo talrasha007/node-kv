@@ -16,6 +16,14 @@ describe('LMDB int32-int32', function () {
         valType: 'int32'
     });
 
+    var dupdb = env.openDb({
+        name: 'testdup',
+        keyType: 'int32',
+        valType: 'int32',
+        allowDup: true
+    });
+
+
     it('should throw exception when open db with same name.', function () {
         expect(function () {
             env.openDb({ name: 'test' });
@@ -62,6 +70,26 @@ describe('LMDB int32-int32', function () {
         expect(db.get(2, txn)).to.be(2);
         txn.commit();
         expect(db.get(2)).to.be(2);
+    });
+
+    it('dup should work as expected.', function () {
+        dupdb.put(1, 1);
+        expect(dupdb.exists(1, 1)).to.be(true);
+        expect(dupdb.exists(1, 2)).to.be(false);
+        dupdb.put(1, 2);
+        expect(dupdb.exists(1, 1)).to.be(true);
+        expect(dupdb.exists(1, 2)).to.be(true);
+
+        var txn = env.beginTxn();
+        dupdb.put(2, 1, txn);
+        expect(dupdb.exists(2, 1, txn)).to.be(true);
+        expect(dupdb.exists(2, 1)).to.be(false);
+        dupdb.put(2, 2, txn);
+        expect(dupdb.exists(2, 2, txn)).to.be(true);
+        expect(dupdb.exists(2, 2)).to.be(false);
+        txn.commit();
+        expect(dupdb.exists(1, 1)).to.be(true);
+        expect(dupdb.exists(1, 2)).to.be(true);
     });
 
     after(function () {
