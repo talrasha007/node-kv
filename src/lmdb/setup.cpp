@@ -16,6 +16,7 @@ Handle<Object> kv::lmdb::v8export() {
 	env::setup_export(ret);
 	txn::setup_export(ret);
 	setup_db_export(ret);
+	setup_cursor_export(ret);
 
 	return ret;
 }

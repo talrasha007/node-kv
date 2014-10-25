@@ -23,6 +23,7 @@ namespace kv {
 		private:
 			friend class txn_scope;
 			template <class K, class V> friend class db;
+			template <class K, class V> friend class cursor;
 
 			bool _readonly;
 

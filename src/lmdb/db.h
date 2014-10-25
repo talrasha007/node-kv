@@ -29,6 +29,8 @@ namespace kv {
 			~db();
 
 		private:
+			template <class KK, class VV> friend class cursor;
+
 			MDB_dbi _dbi;
 			env *_env;
 			MDB_cursor *_cur;
