@@ -53,6 +53,28 @@ suite('LMDB', function () {
     });
 });
 
+suite('LMDB_cursor_get', function () {
+    var txn, cur;
+    before(function () {
+        txn = env.beginTxn(true);
+        cur = dbI32.cursor(txn);
+        cur.first();
+    });
+
+    bench('seq', function () {
+        if (!cur.next()) cur.first();
+    });
+
+    bench('random', function () {
+        cur.seek(Math.random() * 5000000);
+    });
+
+    after(function () {
+        cur.close();
+        txn.abort();
+    });
+});
+
 function defineBatch(bsize) {
     suite('LMDB_Batch_seq_' + bsize, function () {
         var i = 0;
