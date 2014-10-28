@@ -1,9 +1,7 @@
-node-kv
-=======
+#node-kv
+An embeded key-value store for node.js, extremely fast.
 
 [中文文档猛戳此处](https://github.com/talrasha007/node-kv/blob/master/README.zhcn.md)
-
-An embeded key-value store for node.js, extremely fast.
 
 ## Features
 - Multiple kv engine support. (Currently, LMDB only, LevelDB/RocksDB will be supported soon.)
