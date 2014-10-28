@@ -1,3 +1,5 @@
+# I'll write documents when i have enough time  -_______-
+
 # LMDB
   It's a lmdb wrapper, for more information about lmdb, [click here](http://symas.com/mdb/) & [documents](http://symas.com/mdb/doc/index.html)
 
