@@ -8,6 +8,15 @@ var env = new lmdb.Env({
 });
 
 (function () {
+    /* Date type can be:
+     * string
+     * hex - hex string, will convert to a binary data equivalent to Buffer(str, 'hex') for storage.
+     * int32
+     * uint32
+     * int64
+     * number
+     * binary - Buffer object
+     */
     var db = env.openDb({
         name: 'test',
         keyType: 'int32',
@@ -26,15 +35,6 @@ var env = new lmdb.Env({
 })();
 
 (function () {
-    /* Date type can be:
-     * string
-     * hex - hex string, will convert to a binary data equivalent to Buffer(str, 'hex') for storage.
-     * int32
-     * uint32
-     * int64
-     * number
-     * binary - Buffer object
-     */
     var db = env.openDb({
         name: 'str-test',
         keyType: 'string',
