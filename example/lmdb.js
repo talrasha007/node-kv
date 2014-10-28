@@ -42,10 +42,10 @@ var env = new lmdb.Env({
     });
 
     var txn = env.beginTxn();
-    db.put('你好', '世界', txn);
-    console.log(db.get('你好', txn));
+    db.put('Hello', 'world', txn);
+    console.log(db.get('Hello', txn));
     txn.abort();
-    console.log(db.get('你好'));
+    console.log(db.get('Hello'));
 })();
 
 (function () {
