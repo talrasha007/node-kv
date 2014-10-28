@@ -15,7 +15,7 @@ var cdb = cenv.openDb({
 
 cdb.put(1, 2);
 cdb.put(2, 3);
-cenv.flushBatchOps(); // Data will flushed automatically after 1ms, if you want to query immediately, do this.
+cenv.flushBatchOps(); // Data will be flushed automatically after 1ms, if you want to query immediately, do this.
 console.log(cdb.get(1));
 
 cdb.put(3, 3);

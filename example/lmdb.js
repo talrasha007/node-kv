@@ -21,11 +21,20 @@ var env = new lmdb.Env({
 
     db.batchPut(6, 6);
     console.log(db.get(6));
-    env.flushBatchOps();
+    env.flushBatchOps(); // Data will be flushed automatically after 1ms, if you want to query immediately, do this.
     console.log(db.get(6));
 })();
 
 (function () {
+    /* Date type can be:
+     * string
+     * hex - hex string, will convert to a binary data equivalent to Buffer(str, 'hex') for storage.
+     * int32
+     * uint32
+     * int64
+     * number
+     * binary - Buffer object
+     */
     var db = env.openDb({
         name: 'str-test',
         keyType: 'string',
@@ -53,6 +62,19 @@ var env = new lmdb.Env({
     db.put(1, 2);
     console.log(db.exists(1, 1));
     console.log(db.exists(1, 2));
+
+    // Cursor
+    var txn = env.beginTxn(true),
+        cur = db.cursor(txn);
+
+    for (var pair = cur.first(); pair; pair = cur.next()) {
+        console.log("Cursor scan: ", pair);
+    }
+
+    console.log(cur.seek(1));
+    console.log(cur.lowerBound(0));
+
+    txn.abort();
 })();
 
 env.close();
