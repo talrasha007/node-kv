@@ -45,7 +45,7 @@
                     'RuntimeTypeInfo': 'false'
                   , 'EnableFunctionLevelLinking': 'true'
                   , 'ExceptionHandling': '2'
-                  , 'DisableSpecificWarnings': [ '4355', '4530' ,'4267', '4244' ]
+                  , 'DisableSpecificWarnings': [ '4018', '4355', '4530' ,'4267', '4244', '4819' ]
                 }
             }
         }, { # OS != "win"
