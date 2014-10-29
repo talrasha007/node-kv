@@ -21,6 +21,9 @@ coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build
+*.sln
+*.vcxproj
+*.vcxproj.filters
 
 # Dependency directory
 # Commenting this out is preferred by some people, see
