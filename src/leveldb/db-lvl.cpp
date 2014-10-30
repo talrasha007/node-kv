@@ -11,11 +11,14 @@ using namespace kv;
 using namespace kv::level;
 
 template<class T, class CT, class ST> struct lvl_comparator {
-	CT* get_cmp() { return NULL; }
+	static CT* get_cmp() { return NULL; }
 };
 
 template<class N, class CT, class ST> struct lvl_comparator<number_type<N>, CT, ST> : public CT {
-	CT* get_cmp() { return this; }
+	static CT* get_cmp() {
+		static lvl_comparator cmp;
+		return &cmp;
+	}
 
 	typedef number_type<N> key_type;
 
@@ -63,11 +66,11 @@ KVDB_METHOD(ctor) {
 
 	NanUtf8String path(args[0]);
 	db_type* pdb;
-	option_type opt;
-	lvl_comparator<K, comparator_type, slice_type> cmp;
 
+	option_type opt;
 	opt.create_if_missing = true;
-	opt.comparator = cmp.get_cmp();
+	typedef lvl_comparator<K, comparator_type, slice_type> cmp;
+	if (cmp::get_cmp()) opt.comparator = cmp::get_cmp();
 
 	status_type s = db_type::Open(opt, *path, &pdb);
 
@@ -86,11 +89,15 @@ KVDB_METHOD(get) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 
-	K k = K(args[0]);
+	K k(args[0]);
 	slice_type key(k.data(), k.size());
 
 	std::string val;
 	status_type s = dw->_db->Get(readoption_type(), key, &val);
+
+	if (s.IsNotFound()) {
+		NanReturnNull();
+	}
 
 	if (!s.ok()) {
 		NanThrowError("Leveldb: Get error.");
@@ -106,8 +113,8 @@ KVDB_METHOD(put) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 
-	K k = K(args[0]);
-	V v = V(args[0]);
+	K k(args[0]);
+	V v(args[1]);
 	slice_type key(k.data(), k.size()), val(v.data(), v.size());
 
 	status_type s = dw->_db->Put(writeoption_type(), key, val);
@@ -124,7 +131,7 @@ KVDB_METHOD(del) {
 
 	db *dw = ObjectWrap::Unwrap<db>(args.This());
 
-	K k = K(args[0]);
+	K k(args[0]);
 	slice_type key(k.data(), k.size());
 
 	status_type s = dw->_db->Delete(writeoption_type(), key);
