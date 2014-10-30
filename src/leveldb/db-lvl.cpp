@@ -61,6 +61,7 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 KVDB_METHOD(ctor) {
 	NanScope();
 
+	NanUtf8String path(args[0]);
 	db_type* pdb;
 	option_type opt;
 	lvl_comparator<K, comparator_type, slice_type> cmp;
@@ -68,7 +69,7 @@ KVDB_METHOD(ctor) {
 	opt.create_if_missing = true;
 	opt.comparator = cmp.get_cmp();
 
-	status_type s = db_type::Open(opt, "", &pdb);
+	status_type s = db_type::Open(opt, *path, &pdb);
 
 	if (!s.ok()) {
 		NanThrowError("Leveldb: Open db error.");
