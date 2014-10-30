@@ -62,7 +62,7 @@ class FileState {
       return Status::OK();
     }
 
-    assert(offset / kBlockSize <= SIZE_MAX);
+    //assert(offset / kBlockSize <= SIZE_MAX);
     size_t block = static_cast<size_t>(offset / kBlockSize);
     size_t block_offset = offset % kBlockSize;
 
