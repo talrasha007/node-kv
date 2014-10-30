@@ -20,7 +20,7 @@ var dbString = env.openDb({
     valType: 'string' // or valveType
 });
 
-suite('LMDB', function () {
+suite('LevelDB', function () {
     bench('int32put', function () {
         dbI32.put(Math.random() * 5000000, Math.random() * 5000000);
     });
