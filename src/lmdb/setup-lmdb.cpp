@@ -1,12 +1,12 @@
 #include <nan.h>
 
-#include "env.h"
-#include "txn.h"
-#include "cursor.h"
+#include "env-lmdb.h"
+#include "txn-lmdb.h"
+#include "cursor-lmdb.h"
 
-#include "db.h"
+#include "db-lmdb.h"
 
-#include "setup.h"
+#include "setup-lmdb.h"
 
 using namespace v8;
 

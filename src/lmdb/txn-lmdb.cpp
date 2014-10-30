@@ -1,7 +1,7 @@
 #include <nan.h>
 
-#include "env.h"
-#include "txn.h"
+#include "env-lmdb.h"
+#include "txn-lmdb.h"
 
 using namespace v8;
 using namespace kv;

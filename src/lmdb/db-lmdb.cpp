@@ -2,9 +2,9 @@
 
 #include "../kv-types.h"
 
-#include "env.h"
-#include "txn.h"
-#include "db.h"
+#include "env-lmdb.h"
+#include "txn-lmdb.h"
+#include "db-lmdb.h"
 
 using namespace v8;
 using namespace kv;

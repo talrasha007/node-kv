@@ -1,6 +1,6 @@
 #include <nan.h>
 
-#include "lmdb/setup.h"
+#include "lmdb/setup-lmdb.h"
 
 using namespace v8;
 
