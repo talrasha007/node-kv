@@ -5,7 +5,8 @@ var envPath = path.join(__dirname, 'testdb', 'level');
 try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
 var env = new lvl.Env({
-    dir: envPath
+    dir: envPath,
+    cacheSize: 1024 * 1024 * 32
 });
 
 var dbI32 = env.openDb({
