@@ -100,7 +100,7 @@ var env = new lmdb.Env({
     }
 
     console.log(cur.seek(1));
-    console.log(cur.lowerBound(0));
+    console.log(cur.gte(0));
 
     txn.abort();
 })();

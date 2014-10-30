@@ -175,7 +175,7 @@ KVCURSOR_METHOD(seek) {
 	return args.Length() == 1 ? cursorKeyOp<MDB_SET>(args) : cursorKeyValOp<MDB_GET_BOTH>(args);
 }
 
-KVCURSOR_METHOD(lowerBound) {
+KVCURSOR_METHOD(gte) {
 	return args.Length() == 1 ? cursorKeyOp<MDB_SET_RANGE>(args) : cursorKeyValOp<MDB_GET_BOTH_RANGE>(args);
 }
 

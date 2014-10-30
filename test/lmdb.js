@@ -115,15 +115,15 @@ describe('LMDB int32-int32', function () {
         }
 
         expect(cur.seek(99)).to.be(null);
-        expect(cur.lowerBound(99)).to.eql([100, 100]);
-        expect(cur.lowerBound(106)).to.eql([106, 106]);
+        expect(cur.gte(99)).to.eql([100, 100]);
+        expect(cur.gte(106)).to.eql([106, 106]);
         expect(cur.seek(111)).to.be(null);
-        expect(dupcur.lowerBound(99)).to.eql([100, '0abc']);
-        expect(dupcur.lowerBound(99, '000')).to.be(null);
-        expect(dupcur.lowerBound(100, '0abc')).to.eql([100, '0abc']);
-        expect(dupcur.lowerBound(100, '1abc')).to.eql([100, '3abc']);
-        expect(dupcur.lowerBound(100, '2abc')).to.eql([100, '3abc']);
-        expect(dupcur.lowerBound(100, '3abc')).to.eql([100, '3abc']);
+        expect(dupcur.gte(99)).to.eql([100, '0abc']);
+        expect(dupcur.gte(99, '000')).to.be(null);
+        expect(dupcur.gte(100, '0abc')).to.eql([100, '0abc']);
+        expect(dupcur.gte(100, '1abc')).to.eql([100, '3abc']);
+        expect(dupcur.gte(100, '2abc')).to.eql([100, '3abc']);
+        expect(dupcur.gte(100, '3abc')).to.eql([100, '3abc']);
 
         expect(dupcur.seek(100)).to.eql([100, '0abc']);
         expect(dupcur.nextDup()).to.eql([100, '3abc']);
