@@ -31,7 +31,7 @@ namespace kv {
 			static NAN_METHOD(lastDup);
 
 			static NAN_METHOD(seek);
-			static NAN_METHOD(lowerBound);
+			static NAN_METHOD(gte);
 
 		private:
 			cursor(MDB_cursor* cur);

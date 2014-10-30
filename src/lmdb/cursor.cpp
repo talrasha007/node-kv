@@ -35,7 +35,7 @@ template<class K, class V> void cursor<K, V>::setup_export(Handle<Object>& expor
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "prevDup", cursor::prevDup);
 
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "seek", cursor::seek);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "lowerBound", cursor::lowerBound);
+	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "gte", cursor::gte);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "first", cursor::first);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "last", cursor::last);
 
