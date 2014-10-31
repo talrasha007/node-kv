@@ -25,6 +25,7 @@ namespace kv {
 			static NAN_METHOD(put);
 			static NAN_METHOD(get);
 			static NAN_METHOD(del);
+			static NAN_METHOD(write);
 
 		private:
 			db(db_type* pdb);

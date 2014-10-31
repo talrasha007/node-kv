@@ -54,6 +54,7 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "get", db::get);
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "put", db::put);
 	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "del", db::del);
+	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "write", db::write);
 
 	// Set exports
 	exports->Set(NanNew(class_name), dbiTpl->GetFunction());
@@ -119,10 +120,15 @@ KVDB_METHOD(put) {
 	V v(args[1]);
 	slice_type key(k.data(), k.size()), val(v.data(), v.size());
 
-	status_type s = dw->_db->Put(writeoption_type(), key, val);
+	if (args[2]->IsObject()) {
+		batch *bw = ObjectWrap::Unwrap<batch>(args[2]->ToObject());
+		bw->_batch.Put(key, val);
+	} else {
+		status_type s = dw->_db->Put(writeoption_type(), key, val);
 
-	if (!s.ok()) {
-		NanThrowError("Leveldb: Set error.");
+		if (!s.ok()) {
+			NanThrowError("Leveldb: Set error.");
+		}
 	}
 
 	NanReturnUndefined();
@@ -136,10 +142,30 @@ KVDB_METHOD(del) {
 	K k(args[0]);
 	slice_type key(k.data(), k.size());
 
-	status_type s = dw->_db->Delete(writeoption_type(), key);
+	if (args[1]->IsObject()) {
+		batch *bw = ObjectWrap::Unwrap<batch>(args[1]->ToObject());
+		bw->_batch.Delete(key);
+	} else {
+		status_type s = dw->_db->Delete(writeoption_type(), key);
+
+		if (!s.ok()) {
+			NanThrowError("Leveldb: Del error.");
+		}
+	}
+
+	NanReturnUndefined();
+}
+
+KVDB_METHOD(write) {
+	NanScope();
+
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	batch *bw = ObjectWrap::Unwrap<batch>(args[0]->ToObject());
+
+	status_type s = dw->_db->Write(writeoption_type(), &bw->_batch);
 
 	if (!s.ok()) {
-		NanThrowError("Leveldb: Set error.");
+		NanThrowError("Leveldb: Write batch error.");
 	}
 
 	NanReturnUndefined();
