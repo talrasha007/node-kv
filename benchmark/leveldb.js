@@ -38,3 +38,38 @@ suite('LevelDB', function () {
         dbString.get(Math.random() * 5000);
     });
 });
+
+function defineSeqBatch(bsize) {
+    suite('LMDB_Batch_seq_' + bsize, function () {
+        var i = 0;
+
+        before(function () {
+            dbI32.setBatchSize(bsize);
+        });
+
+        bench('put', function () { dbI32.batchPut(i++, i); });
+        bench('del', function () { dbI32.batchDel(--i); });
+    });
+}
+
+defineSeqBatch(10);
+defineSeqBatch(64);
+defineSeqBatch(128);
+defineSeqBatch(256);
+
+function defineRandomBatch(bsize) {
+    suite('LMDB_Batch_random_' + bsize, function () {
+        var i = 0;
+
+        before(function () {
+            dbI32.setBatchSize(bsize);
+        });
+
+        bench('put', function () { dbI32.batchPut(Math.random() * 5000000, i++); });
+    });
+}
+
+defineRandomBatch(10);
+defineRandomBatch(64);
+defineRandomBatch(128);
+defineRandomBatch(256);
