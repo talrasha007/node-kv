@@ -32,7 +32,7 @@ namespace kv {
 			~db();
 
 		private:
-			template <class K, class V> friend class cursor;
+			template <class KK, class VV> friend class cursor;
 			db_type* _db;
 		};
 	}
