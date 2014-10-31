@@ -39,6 +39,26 @@ suite('LevelDB', function () {
     });
 });
 
+suite('LevelDB cursor', function () {
+    var cur;
+    before(function () {
+        cur = dbI32.cursor();
+        cur.first();
+    });
+
+    bench('current', function () {
+        cur.current();
+    });
+
+    bench('seq', function () {
+        if (!cur.next()) cur.first();
+    });
+
+    bench('random', function () {
+        cur.gte(Math.random() * 5000000);
+    });
+});
+
 function defineSeqBatch(bsize) {
     suite('LevelDB_Batch_seq_' + bsize, function () {
         var i = 0;
