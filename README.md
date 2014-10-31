@@ -5,7 +5,9 @@ An embeded key-value store for node.js, extremely fast.
 
 ## Features
 - Multiple kv engine support. (Currently, LMDB only, LevelDB/RocksDB will be supported soon.)
-- High speed. LMDB: >1,000,000op/s for get, >100,000op/s for put.
+- High speed.  
+  LMDB: >1,000,000op/s for get, >100,000op/s for put(batch).  
+  LevelDB: >600,000op/s for get, >350,000op/s for put(batch).
 - Compressed bit-vector support, a good choice for bitmap index. (Coming soon.)
 - Embeded, easy to use.
 
