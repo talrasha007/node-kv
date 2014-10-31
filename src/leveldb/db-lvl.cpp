@@ -69,7 +69,7 @@ KVDB_METHOD(ctor) {
 	db_type* pdb;
 
 	option_type opt;
-	if (args[1]->IsNumber()) opt.block_cache = leveldb::NewLRUCache(args[1]->NumberValue());
+	if (args[1]->IsNumber()) opt.block_cache = leveldb::NewLRUCache(size_t(args[1]->NumberValue()));
 	opt.create_if_missing = true;
 	typedef lvl_comparator<K, comparator_type, slice_type> cmp;
 	if (cmp::get_cmp()) opt.comparator = cmp::get_cmp();
