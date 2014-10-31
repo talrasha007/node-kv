@@ -93,6 +93,11 @@ describe('LMDB int32-int32', function () {
     });
 
     it('cursor should work as expected.', function () {
+        function expectCursor(cur, key, val) {
+            expect(cur.key()).to.be(key);
+            expect(cur.val()).to.be(val);
+        }
+
         var i, j;
         for (i = 100; i < 110; i++) {
             db.put(i, i);
@@ -105,37 +110,76 @@ describe('LMDB int32-int32', function () {
         var txn = env.beginTxn();
         var cur = db.cursor(txn), dupcur = dupdb.cursor(txn);
         expect(function () { cur.current(); }).to.throwException();
-        expect(function () { cur.seek(100, 100); }).to.throwException();
+        expect(function () { cur.seek(100, 100); }).to.throwException(); // Cannot seek both key/val when allowDup === false.
         for (i = 100; i < 101; i++) {
-            expect(cur.seek(i)).to.eql([i, i]);
+            expect(cur.seek(i)).to.be(true);
+            expectCursor(cur, i, i);
+
             for (j = 0; j < 10; j++) {
-                if (0 === j % 3) expect(dupcur.seek(i, j + 'abc')).to.eql([i, j + 'abc']);
-                else expect(dupcur.seek(i, j + 'abc')).to.be(null);
+                if (0 === j % 3) {
+                    expect(dupcur.seek(i, j + 'abc')).to.be(true);
+                    expectCursor(dupcur, i, j + 'abc');
+                } else {
+                    expect(dupcur.seek(i, j + 'abc')).to.be(false);
+                }
             }
         }
 
-        expect(cur.seek(99)).to.be(null);
-        expect(cur.gte(99)).to.eql([100, 100]);
-        expect(cur.gte(106)).to.eql([106, 106]);
-        expect(cur.seek(111)).to.be(null);
-        expect(dupcur.gte(99)).to.eql([100, '0abc']);
-        expect(dupcur.gte(99, '000')).to.be(null);
-        expect(dupcur.gte(100, '0abc')).to.eql([100, '0abc']);
-        expect(dupcur.gte(100, '1abc')).to.eql([100, '3abc']);
-        expect(dupcur.gte(100, '2abc')).to.eql([100, '3abc']);
-        expect(dupcur.gte(100, '3abc')).to.eql([100, '3abc']);
+        expect(cur.seek(99)).to.be(false);
 
-        expect(dupcur.seek(100)).to.eql([100, '0abc']);
-        expect(dupcur.nextDup()).to.eql([100, '3abc']);
-        expect(dupcur.nextDup()).to.eql([100, '6abc']);
-        expect(dupcur.nextDup()).to.eql([100, '9abc']);
-        expect(dupcur.nextDup()).to.be(null);
+        expect(cur.gte(99)).to.be(true);
+        expectCursor(cur, 100, 100);
 
-        expect(dupcur.seek(100)).to.eql([100, '0abc']);
-        expect(dupcur.next()).to.eql([100, '3abc']);
-        expect(dupcur.next()).to.eql([100, '6abc']);
-        expect(dupcur.next()).to.eql([100, '9abc']);
-        expect(dupcur.next()).to.eql([101, '0abc']);
+        expect(cur.gte(106)).to.be(true);
+        expectCursor(cur, 106, 106);
+
+        expect(cur.seek(111)).to.be(false);
+
+        expect(dupcur.gte(99)).to.be(true);
+        expectCursor(dupcur, 100, '0abc');
+
+        expect(dupcur.gte(99, '000')).to.be(false);
+
+        expect(dupcur.gte(100, '0abc')).to.be(true);
+        expectCursor(dupcur, 100, '0abc');
+
+        expect(dupcur.gte(100, '1abc')).to.be(true);
+        expectCursor(dupcur, 100, '3abc');
+
+        expect(dupcur.gte(100, '2abc')).to.be(true);
+        expectCursor(dupcur, 100, '3abc');
+
+        expect(dupcur.gte(100, '3abc')).to.be(true);
+        expectCursor(dupcur, 100, '3abc');
+
+        expect(dupcur.seek(100)).to.be(true);
+        expectCursor(dupcur, 100, '0abc');
+
+        expect(dupcur.nextDup()).to.be(true);
+        expectCursor(dupcur, 100, '3abc');
+
+        expect(dupcur.nextDup()).to.be(true);
+        expectCursor(dupcur, 100, '6abc');
+
+        expect(dupcur.nextDup()).to.be(true);
+        expectCursor(dupcur, 100, '9abc');
+
+        expect(dupcur.nextDup()).to.be(false);
+
+        expect(dupcur.seek(100)).to.be(true);
+        expectCursor(dupcur, 100, '0abc');
+
+        expect(dupcur.next()).to.be(true);
+        expectCursor(dupcur, 100, '3abc');
+
+        expect(dupcur.next()).to.be(true);
+        expectCursor(dupcur, 100, '6abc');
+
+        expect(dupcur.next()).to.be(true);
+        expectCursor(dupcur, 100, '9abc');
+
+        expect(dupcur.next()).to.be(true);
+        expectCursor(dupcur, 101, '0abc');
 
         cur.close();
         dupcur.close();
