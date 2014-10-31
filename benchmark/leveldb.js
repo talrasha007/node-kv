@@ -47,7 +47,7 @@ suite('LevelDB cursor', function () {
     });
 
     bench('current', function () {
-        cur.current();
+        cur.key();
     });
 
     bench('seq', function () {

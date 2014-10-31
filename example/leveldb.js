@@ -25,5 +25,5 @@ console.log(db.get(3));
 
 var cur = db.cursor();
 for (var i = cur.first(); i; i = cur.next()) {
-    console.log(i);
+    console.log([cur.key(), cur.val()]);
 }
