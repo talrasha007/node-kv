@@ -40,7 +40,7 @@ suite('LevelDB', function () {
 });
 
 function defineSeqBatch(bsize) {
-    suite('LMDB_Batch_seq_' + bsize, function () {
+    suite('LevelDB_Batch_seq_' + bsize, function () {
         var i = 0;
 
         before(function () {
@@ -58,7 +58,7 @@ defineSeqBatch(128);
 defineSeqBatch(256);
 
 function defineRandomBatch(bsize) {
-    suite('LMDB_Batch_random_' + bsize, function () {
+    suite('LevelDB_Batch_random_' + bsize, function () {
         var i = 0;
 
         before(function () {
