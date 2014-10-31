@@ -11,6 +11,7 @@ namespace kv {
 			typedef K key_type;
 			typedef V value_type;
 			typedef leveldb::DB db_type;
+			typedef leveldb::Cache cache_type;
 			typedef leveldb::Slice slice_type;
 			typedef leveldb::Options option_type;
 			typedef leveldb::ReadOptions readoption_type;
@@ -28,12 +29,13 @@ namespace kv {
 			static NAN_METHOD(write);
 
 		private:
-			db(db_type* pdb);
+			db(db_type* pdb, cache_type* pcache);
 			~db();
 
 		private:
 			template <class KK, class VV> friend class cursor;
 			db_type* _db;
+			cache_type* _cache;
 		};
 	}
 }

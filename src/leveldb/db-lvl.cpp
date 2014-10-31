@@ -82,7 +82,7 @@ KVDB_METHOD(ctor) {
 		NanReturnUndefined();
 	}
 
-	db* ptr = new db(pdb);
+	db* ptr = new db(pdb, opt.block_cache);
 	ptr->Wrap(args.This());
 	NanReturnValue(args.This());
 }
@@ -171,10 +171,11 @@ KVDB_METHOD(write) {
 	NanReturnUndefined();
 }
 
-template <class K, class V> db<K, V>::db(db_type* pdb) : _db(pdb) {
+template <class K, class V> db<K, V>::db(db_type* pdb, cache_type* pcache) : _db(pdb), _cache(pcache) {
 
 }
 
 template <class K, class V> db<K, V>::~db() {
 	delete _db;
+	delete _cache;
 }
