@@ -154,7 +154,12 @@ KVCURSOR_METHOD(key) {
 
 	MDB_val key = { 0, 0 }, data = { 0, 0 };
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, MDB_GET_CURRENT);
-	if (rc != 0 && rc != MDB_NOTFOUND) {
+
+	if (rc == MDB_NOTFOUND) {
+		NanReturnNull();
+	}
+
+	if (rc != 0) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
@@ -169,7 +174,12 @@ KVCURSOR_METHOD(value) {
 
 	MDB_val key = { 0, 0 }, data = { 0, 0 };
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, MDB_GET_CURRENT);
-	if (rc != 0 && rc != MDB_NOTFOUND) {
+
+	if (rc == MDB_NOTFOUND) {
+		NanReturnNull();
+	}
+
+	if (rc != 0) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
