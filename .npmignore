@@ -7,5 +7,5 @@
 
 build/
 testdb
-deps/snappy/snappy-1.1.2/testdata/
-deps/leveldb/leveldb-1.18.0/doc/
+3rd-party/snappy/snappy-1.1.2/testdata/
+3rd-party/leveldb/leveldb-1.18/doc/
