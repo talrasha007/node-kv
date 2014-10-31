@@ -17,7 +17,13 @@ console.log(db.get(1));
 db.del(1);
 console.log(db.get(1));
 
+db.del(3);
 db.batchPut(3, 4);
 console.log(db.get(3));
 db.flushBatchOps();
 console.log(db.get(3));
+
+var cur = db.cursor();
+for (var i = cur.first(); i; i = cur.next()) {
+    console.log(i);
+}
