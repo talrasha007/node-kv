@@ -28,7 +28,9 @@ template<class K, class V> void cursor<K, V>::setup_export(Handle<Object>& expor
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "close", cursor::close);
 
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "del", cursor::del);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "current", cursor::current);
+	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "key", cursor::key);
+	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "val", cursor::value);
+
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "next", cursor::next);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "prev", cursor::prev);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "nextDup", cursor::nextDup);
@@ -94,17 +96,12 @@ template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::curso
 
 	MDB_val key = { 0, 0 }, data = { 0, 0 };
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, OP);
-	if (rc == MDB_NOTFOUND) {
-		NanReturnNull();
-	} if (rc != 0) {
+	if (rc != 0 && rc != MDB_NOTFOUND) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
 
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K((const char*)key.mv_data, key.mv_size).v8value());
-	ret->Set(1, V((const char*)data.mv_data, data.mv_size).v8value());
-	NanReturnValue(ret);
+	NanReturnValue(NanNew(rc != MDB_NOTFOUND));
 }
 
 template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::cursorKeyOp) {
@@ -119,17 +116,12 @@ template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::curso
 	key.mv_size = k.size();
 
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, OP);
-	if (rc == MDB_NOTFOUND) {
-		NanReturnNull();
-	} else if (rc != 0) {
+	if (rc != 0 && rc != MDB_NOTFOUND) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
 
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K((const char*)key.mv_data, key.mv_size).v8value());
-	ret->Set(1, V((const char*)data.mv_data, data.mv_size).v8value());
-	NanReturnValue(ret);
+	NanReturnValue(NanNew(rc != MDB_NOTFOUND));
 }
 
 template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::cursorKeyValOp) {
@@ -147,20 +139,44 @@ template<class K, class V> template<MDB_cursor_op OP> NAN_METHOD(KVCURSOR::curso
 	data.mv_size = v.size();
 
 	int rc = mdb_cursor_get(cw->_cursor, &key, &data, OP);
-	if (rc == MDB_NOTFOUND) {
-		NanReturnNull();
-	} else if (rc != 0) {
+	if (rc != 0 && rc != MDB_NOTFOUND) {
 		NanThrowError(mdb_strerror(rc));
 		NanReturnUndefined();
 	}
 
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K((const char*)key.mv_data, key.mv_size).v8value());
-	ret->Set(1, V((const char*)data.mv_data, data.mv_size).v8value());
-	NanReturnValue(ret);
+	NanReturnValue(NanNew(rc != MDB_NOTFOUND));
 }
 
-KVCURSOR_METHOD(current) { return cursorOp<MDB_GET_CURRENT>(args); }
+KVCURSOR_METHOD(key) {
+	NanScope();
+
+	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
+
+	MDB_val key = { 0, 0 }, data = { 0, 0 };
+	int rc = mdb_cursor_get(cw->_cursor, &key, &data, MDB_GET_CURRENT);
+	if (rc != 0 && rc != MDB_NOTFOUND) {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+
+	NanReturnValue(K((const char*)key.mv_data, key.mv_size).v8value());
+}
+
+KVCURSOR_METHOD(value) {
+	NanScope();
+
+	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
+
+	MDB_val key = { 0, 0 }, data = { 0, 0 };
+	int rc = mdb_cursor_get(cw->_cursor, &key, &data, MDB_GET_CURRENT);
+	if (rc != 0 && rc != MDB_NOTFOUND) {
+		NanThrowError(mdb_strerror(rc));
+		NanReturnUndefined();
+	}
+
+	NanReturnValue(V((const char*)data.mv_data, data.mv_size).v8value());
+}
+
 KVCURSOR_METHOD(next) { return cursorOp<MDB_NEXT>(args); }
 KVCURSOR_METHOD(prev) { return cursorOp<MDB_PREV>(args); }
 KVCURSOR_METHOD(nextDup) { return cursorOp<MDB_NEXT_DUP>(args); }
