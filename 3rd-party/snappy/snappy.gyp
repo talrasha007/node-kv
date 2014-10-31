@@ -14,7 +14,7 @@
   , 'standalone_static_library': 1
   , 'include_dirs': [
         '<(os_include)'
-      , 'snappy-1.1.1'
+      , 'snappy-1.1.2'
     ]
   , 'direct_dependent_settings': {
         'include_dirs': [
