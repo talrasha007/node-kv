@@ -61,6 +61,10 @@ suite('LMDB_cursor_get', function () {
         cur.first();
     });
 
+    bench('key', function () {
+        if (!cur.next()) cur.key();
+    });
+
     bench('seq', function () {
         if (!cur.next()) cur.first();
     });
