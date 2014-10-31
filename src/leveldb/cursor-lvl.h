@@ -20,7 +20,9 @@ namespace kv {
 
 			static NAN_METHOD(ctor);
 
-			static NAN_METHOD(current);
+			static NAN_METHOD(key);
+			static NAN_METHOD(value);
+
 			static NAN_METHOD(next);
 			static NAN_METHOD(prev);
 

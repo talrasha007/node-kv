@@ -24,7 +24,9 @@ template<class K, class V> void cursor<K, V>::setup_export(Handle<Object>& expor
 	cursorTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "current", cursor::current);
+	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "key", cursor::key);
+	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "val", cursor::value);
+
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "next", cursor::next);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "prev", cursor::prev);
 	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "first", cursor::first);
@@ -52,23 +54,12 @@ KVCURSOR_METHOD(ctor) {
 
 template<class K, class V> template<void (KVCURSOR::iterator_type::*FN)()> NAN_METHOD(KVCURSOR::cursorOp) {
 	NanScope();
-
 	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
 	(cw->_cursor->*FN)();
-	if (!cw->_cursor->Valid()) {
-		NanReturnNull();
-	}
-
-	db<K, V>::slice_type key(cw->_cursor->key());
-	db<K, V>::slice_type val(cw->_cursor->value());
-
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K(key.data(), key.size()).v8value());
-	ret->Set(1, V(val.data(), val.size()).v8value());
-	NanReturnValue(ret);
+	NanReturnValue(NanNew(cw->_cursor->Valid()));
 }
 
-KVCURSOR_METHOD(current) {
+KVCURSOR_METHOD(key) {
 	NanScope();
 
 	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
@@ -77,12 +68,19 @@ KVCURSOR_METHOD(current) {
 	}
 
 	db<K, V>::slice_type key(cw->_cursor->key());
-	db<K, V>::slice_type val(cw->_cursor->value());
+	NanReturnValue(K(key.data(), key.size()).v8value());
+}
 
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K(key.data(), key.size()).v8value());
-	ret->Set(1, V(val.data(), val.size()).v8value());
-	NanReturnValue(ret);
+KVCURSOR_METHOD(value) {
+	NanScope();
+
+	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
+	if (!cw->_cursor->Valid()) {
+		NanReturnNull();
+	}
+
+	db<K, V>::slice_type val(cw->_cursor->value());
+	NanReturnValue(V(val.data(), val.size()).v8value());
 }
 
 KVCURSOR_METHOD(next) {
@@ -107,20 +105,10 @@ KVCURSOR_METHOD(gte) {
 	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
 
 	K k(args[0]);
-	db<K, V>::slice_type query(k.data(), k.size());
-	cw->_cursor->Seek(query);
+	db<K, V>::slice_type key(k.data(), k.size());
+	cw->_cursor->Seek(key);
 
-	if (!cw->_cursor->Valid()) {
-		NanReturnNull();
-	}
-
-	db<K, V>::slice_type key(cw->_cursor->key());
-	db<K, V>::slice_type val(cw->_cursor->value());
-
-	Local<Array> ret = NanNew<Array>(2);
-	ret->Set(0, K(key.data(), key.size()).v8value());
-	ret->Set(1, V(val.data(), val.size()).v8value());
-	NanReturnValue(ret);
+	NanReturnValue(NanNew(cw->_cursor->Valid()));
 }
 
 template <class K, class V> cursor<K, V>::cursor(iterator_type *cur) : _cursor(cur) {
