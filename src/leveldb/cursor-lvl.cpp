@@ -67,7 +67,7 @@ KVCURSOR_METHOD(key) {
 		NanReturnNull();
 	}
 
-	db<K, V>::slice_type key(cw->_cursor->key());
+	typename db<K, V>::slice_type key(cw->_cursor->key());
 	NanReturnValue(K(key.data(), key.size()).v8value());
 }
 
@@ -79,7 +79,7 @@ KVCURSOR_METHOD(value) {
 		NanReturnNull();
 	}
 
-	db<K, V>::slice_type val(cw->_cursor->value());
+	typename db<K, V>::slice_type val(cw->_cursor->value());
 	NanReturnValue(V(val.data(), val.size()).v8value());
 }
 
@@ -105,7 +105,7 @@ KVCURSOR_METHOD(gte) {
 	cursor *cw = ObjectWrap::Unwrap<cursor>(args.This());
 
 	K k(args[0]);
-	db<K, V>::slice_type key(k.data(), k.size());
+	typename db<K, V>::slice_type key(k.data(), k.size());
 	cw->_cursor->Seek(key);
 
 	NanReturnValue(NanNew(cw->_cursor->Valid()));
