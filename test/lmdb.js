@@ -109,7 +109,7 @@ describe('LMDB int32-int32', function () {
 
         var txn = env.beginTxn();
         var cur = db.cursor(txn), dupcur = dupdb.cursor(txn);
-        expect(function () { cur.current(); }).to.throwException();
+        expect(function () { cur.key(); }).to.throwException();
         expect(function () { cur.seek(100, 100); }).to.throwException(); // Cannot seek both key/val when allowDup === false.
         for (i = 100; i < 101; i++) {
             expect(cur.seek(i)).to.be(true);
