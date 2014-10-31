@@ -78,7 +78,7 @@ KVDB_METHOD(ctor) {
 	status_type s = db_type::Open(opt, *path, &pdb);
 
 	if (!s.ok()) {
-		NanThrowError("Leveldb: Open db error.");
+		NanThrowError(s.ToString().c_str());
 		NanReturnUndefined();
 	}
 
@@ -103,7 +103,7 @@ KVDB_METHOD(get) {
 	}
 
 	if (!s.ok()) {
-		NanThrowError("Leveldb: Get error.");
+		NanThrowError(s.ToString().c_str());
 		NanReturnUndefined();
 	}
 
@@ -127,7 +127,7 @@ KVDB_METHOD(put) {
 		status_type s = dw->_db->Put(writeoption_type(), key, val);
 
 		if (!s.ok()) {
-			NanThrowError("Leveldb: Set error.");
+			NanThrowError(s.ToString().c_str());
 		}
 	}
 
@@ -149,7 +149,7 @@ KVDB_METHOD(del) {
 		status_type s = dw->_db->Delete(writeoption_type(), key);
 
 		if (!s.ok()) {
-			NanThrowError("Leveldb: Del error.");
+			NanThrowError(s.ToString().c_str());
 		}
 	}
 
@@ -165,7 +165,7 @@ KVDB_METHOD(write) {
 	status_type s = dw->_db->Write(writeoption_type(), &bw->_batch);
 
 	if (!s.ok()) {
-		NanThrowError("Leveldb: Write batch error.");
+		NanThrowError(s.ToString().c_str());
 	}
 
 	NanReturnUndefined();
