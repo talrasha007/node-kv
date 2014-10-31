@@ -98,12 +98,14 @@ var env = new lmdb.Env({
     var txn = env.beginTxn(true),
         cur = db.cursor(txn);
 
-    for (var pair = cur.first(); pair; pair = cur.next()) {
-        console.log("Cursor scan: ", pair);
+    for (var ok = cur.first(); ok; ok = cur.next()) {
+        console.log("Cursor scan: ", cur.key(), cur.val());
     }
 
     console.log(cur.seek(1));
+    console.log(cur.key(), cur.val());
     console.log(cur.gte(0));
+    console.log(cur.key(), cur.val());
 
     txn.abort();
 })();

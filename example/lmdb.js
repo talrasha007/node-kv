@@ -72,7 +72,9 @@ var env = new lmdb.Env({
     }
 
     console.log(cur.seek(1));
+    console.log(cur.key(), cur.val());
     console.log(cur.gte(0));
+    console.log(cur.key(), cur.val());
 
     txn.abort();
 })();
