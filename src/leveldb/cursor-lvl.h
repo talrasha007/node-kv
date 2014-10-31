@@ -32,11 +32,11 @@ namespace kv {
 			static NAN_METHOD(gte);
 
 		private:
-			cursor(iterator_type* cur);
+			cursor(typename iterator_type* cur);
 			~cursor();
 
 		private:
-			iterator_type* _cursor;
+			typename iterator_type* _cursor;
 		};
 	}
 }

@@ -45,7 +45,7 @@ KVCURSOR_METHOD(ctor) {
 	NanScope();
 
 	db<K, V> *dw = ObjectWrap::Unwrap<db<K, V> >(args[0]->ToObject());
-	iterator_type *cur = dw->_db->NewIterator(db<K, V>::readoption_type());
+	typename iterator_type *cur = dw->_db->NewIterator(db<K, V>::readoption_type());
 
 	cursor *ptr = new cursor(cur);
 	ptr->Wrap(args.This());
@@ -111,7 +111,7 @@ KVCURSOR_METHOD(gte) {
 	NanReturnValue(NanNew(cw->_cursor->Valid()));
 }
 
-template <class K, class V> cursor<K, V>::cursor(iterator_type *cur) : _cursor(cur) {
+template <class K, class V> cursor<K, V>::cursor(typename iterator_type *cur) : _cursor(cur) {
 
 }
 
