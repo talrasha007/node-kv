@@ -30,7 +30,7 @@ It's a lmdb wrapper, for more information about lmdb, [click here](http://symas.
 ```js
 // This example shows how to use lmdb apis.
 var path = require('path'),
-    lmdb = require('../').lmdb;
+    lmdb = require('node-kv').lmdb;
 
 var env = new lmdb.Env({
     dir: path.join(__dirname, 'testdb'),
@@ -119,7 +119,7 @@ env.close();
 // Cache is used for caching hot data, it is a wrapper of lmdb, it holds 2 lmdb envs(current & old), when current env is full,
 // it will close old env, set current env as old, and then open a new env as current.
 var path = require('path'),
-    cache = require('../').cache;
+    cache = require('node-kv').cache;
 
 var cenv = new cache.Env({
     dir: path.join(__dirname, 'testdb', 'cache'),
@@ -146,4 +146,35 @@ setTimeout(function () {
 ```
 
 ### - LevelDB
-  - Comming soon.
+Google [leveldb](https://github.com/google/leveldb) wrapper.
+```js
+var path = require('path'),
+    lvldb = require('node-kv').leveldb;
+
+var env = new lvldb.Env({
+    dir: path.join(__dirname, 'testdb', 'level'),
+    cacheSize: 256 * 1024 * 1024 // 8MB by default.
+});
+
+var db = env.openDb({
+    name: 'test',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+db.put(1, 1);
+console.log(db.get(1));
+db.del(1);
+console.log(db.get(1));
+
+db.del(3);
+db.batchPut(3, 4);
+console.log(db.get(3));
+db.flushBatchOps();
+console.log(db.get(3));
+
+var cur = db.cursor();
+for (var i = cur.first(); i; i = cur.next()) {
+    console.log([cur.key(), cur.val()]);
+}
+```

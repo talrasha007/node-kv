@@ -3,7 +3,7 @@ var path = require('path'),
 
 var env = new lvldb.Env({
     dir: path.join(__dirname, 'testdb', 'level'),
-    cacheSize: 256 * 1024 * 1024
+    cacheSize: 256 * 1024 * 1024 // 8MB by default.
 });
 
 var db = env.openDb({

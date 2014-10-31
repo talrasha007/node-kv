@@ -27,7 +27,7 @@ matcha  # Run benchmark.
 关于LMDB, [猛击此处](http://symas.com/mdb/) & [文档](http://symas.com/mdb/doc/index.html)
 ```js
 var path = require('path'),
-    lmdb = require('../').lmdb;
+    lmdb = require('node-kv').lmdb;
 
 var env = new lmdb.Env({
     dir: path.join(__dirname, 'testdb'),
@@ -116,7 +116,7 @@ env.close();
 // 这东东是用来做热数据缓存用的，它是一个lmdb的封装，内有两个lmdb env（一个当前，一个旧），
 // 当前的满了后，会把旧的env关掉，把当前的设置成旧的，然后新开一个lmdb env做为当前。
 var path = require('path'),
-    cache = require('../').cache;
+    cache = require('node-kv').cache;
 
 var cenv = new cache.Env({
     dir: path.join(__dirname, 'testdb', 'cache'),
@@ -143,4 +143,35 @@ setTimeout(function () {
 ```
 
 ### - LevelDB
-即将支持
+Google [leveldb](https://github.com/google/leveldb) wrapper.
+```js
+var path = require('path'),
+    lvldb = require('node-kv').leveldb;
+
+var env = new lvldb.Env({
+    dir: path.join(__dirname, 'testdb', 'level'),
+    cacheSize: 256 * 1024 * 1024 // 8MB by default.
+});
+
+var db = env.openDb({
+    name: 'test',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+db.put(1, 1);
+console.log(db.get(1));
+db.del(1);
+console.log(db.get(1));
+
+db.del(3);
+db.batchPut(3, 4);
+console.log(db.get(3));
+db.flushBatchOps();
+console.log(db.get(3));
+
+var cur = db.cursor();
+for (var i = cur.first(); i; i = cur.next()) {
+    console.log([cur.key(), cur.val()]);
+}
+```
