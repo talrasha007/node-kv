@@ -2,7 +2,7 @@ var path = require('path'),
     expect = require('expect.js'),
     lmdb = require('../').lmdb;
 
-var envPath = path.join(__dirname, 'testdb');
+var envPath = path.join(__dirname, 'testdb', 'lmdb');
 try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
 describe('LMDB int32-int32', function () {

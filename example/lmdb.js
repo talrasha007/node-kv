@@ -2,7 +2,7 @@ var path = require('path'),
     lmdb = require('../').lmdb;
 
 var env = new lmdb.Env({
-    dir: path.join(__dirname, 'testdb'),
+    dir: path.join(__dirname, 'testdb', 'lmdb'),
     mapSize: 8 * 1024 * 1024, // 128M by default
     maxDbs: 64 // 32 by default
 });
