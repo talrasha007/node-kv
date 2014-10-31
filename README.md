@@ -4,7 +4,7 @@ An embeded key-value store for node.js, extremely fast.
 [中文文档猛戳此处](https://github.com/talrasha007/node-kv/blob/master/README.zhcn.md)
 
 ## Features
-- Multiple kv engine support. (Currently, LMDB only, LevelDB/RocksDB will be supported soon.)
+- Multiple kv engine support. (LMDB / LevelDB / RocksDB(WIP)).
 - High speed.  
   LMDB: >1,000,000op/s for get, >100,000op/s for put(batch).  
   LevelDB: >600,000op/s for get, >350,000op/s for put(batch).

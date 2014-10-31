@@ -2,7 +2,7 @@
 一个嵌入式的kv存储引擎，特点就是灰常快。
 
 # 特性
-- 多个kv引擎的支持(LMDB/LevelDB/RocksDB，那个，现在只有LMDB先。)
+- 多个kv引擎的支持(LMDB / LevelDB / RocksDB(WIP))
 - 高速
 - 方便
 - 即将支持bit-vector运算，会是做bitmap index的一个不错的选择。
