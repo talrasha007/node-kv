@@ -4,6 +4,7 @@
   "repository": "https://github.com/talrasha007/node-kv.git",
   "description": "An embeded key-value store for node.js, extremely fast.",
   "readmeFile": "README.md",
+  "keywords": ["key", "value", "lmdb", "leveldb", "db", "store"],
   "main": "./lib",
   "dependencies": {
     "debug": "^2.1.0",
