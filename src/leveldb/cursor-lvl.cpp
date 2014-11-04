@@ -24,15 +24,15 @@ template<class K, class V> void cursor<K, V>::setup_export(Handle<Object>& expor
 	cursorTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "key", cursor::key);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "val", cursor::value);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "key", cursor::key);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "val", cursor::value);
 
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "next", cursor::next);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "prev", cursor::prev);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "first", cursor::first);
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "last", cursor::last);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "next", cursor::next);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "prev", cursor::prev);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "first", cursor::first);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "last", cursor::last);
 
-	NODE_SET_METHOD(cursorTpl->PrototypeTemplate(), "gte", cursor::gte);
+	NODE_SET_PROTOTYPE_METHOD(cursorTpl, "gte", cursor::gte);
 
 	// Set exports
 	exports->Set(NanNew(class_name), cursorTpl->GetFunction());

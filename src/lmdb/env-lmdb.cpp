@@ -14,12 +14,12 @@ void env::setup_export(Handle<Object>& exports) {
 	envTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "setMapSize", env::setMapSize);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "setMaxDbs", env::setMaxDbs);
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "setMapSize", env::setMapSize);
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "setMaxDbs", env::setMaxDbs);
 
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "open", env::open);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "close", env::close);
-	NODE_SET_METHOD(envTpl->PrototypeTemplate(), "sync", env::sync);
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "open", env::open);
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "close", env::close);
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "sync", env::sync);
 
 	// Set exports
 	exports->Set(NanNew("Env"), envTpl->GetFunction());

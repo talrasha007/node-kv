@@ -15,7 +15,7 @@ void batch::setup_export(Handle<Object>& exports) {
 	batchTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(batchTpl->PrototypeTemplate(), "clear", batch::clear);
+	NODE_SET_PROTOTYPE_METHOD(batchTpl, "clear", batch::clear);
 
 	// Set exports
 	exports->Set(NanNew("Batch"), batchTpl->GetFunction());

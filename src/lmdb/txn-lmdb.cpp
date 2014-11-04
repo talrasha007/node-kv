@@ -14,10 +14,10 @@ void txn::setup_export(Handle<Object>& exports) {
 	txnTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "commit", txn::commit);
-	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "abort", txn::abort);
-	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "reset", txn::reset);
-	NODE_SET_METHOD(txnTpl->PrototypeTemplate(), "renew", txn::renew);
+	NODE_SET_PROTOTYPE_METHOD(txnTpl, "commit", txn::commit);
+	NODE_SET_PROTOTYPE_METHOD(txnTpl, "abort", txn::abort);
+	NODE_SET_PROTOTYPE_METHOD(txnTpl, "reset", txn::reset);
+	NODE_SET_PROTOTYPE_METHOD(txnTpl, "renew", txn::renew);
 
 	// Set exports
 	exports->Set(NanNew("Txn"), txnTpl->GetFunction());

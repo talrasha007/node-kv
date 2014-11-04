@@ -51,10 +51,10 @@ template <class K, class V> void db<K, V>::setup_export(Handle<Object>& exports)
 	dbiTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
-	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "get", db::get);
-	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "put", db::put);
-	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "del", db::del);
-	NODE_SET_METHOD(dbiTpl->PrototypeTemplate(), "write", db::write);
+	NODE_SET_PROTOTYPE_METHOD(dbiTpl, "get", db::get);
+	NODE_SET_PROTOTYPE_METHOD(dbiTpl, "put", db::put);
+	NODE_SET_PROTOTYPE_METHOD(dbiTpl, "del", db::del);
+	NODE_SET_PROTOTYPE_METHOD(dbiTpl, "write", db::write);
 
 	// Set exports
 	exports->Set(NanNew(class_name), dbiTpl->GetFunction());
