@@ -80,6 +80,9 @@ describe('LMDB int32-int32', function () {
         expect(dupdb.exists(1, '1adb')).to.be(true);
         expect(dupdb.exists(1, '2adb')).to.be(true);
 
+        dupdb.put(1, '2db');
+        expect(dupdb.exists(1, '2db0')).to.be(true);
+
         var txn = env.beginTxn();
         dupdb.put(2, '1adb', txn);
         expect(dupdb.exists(2, '1adb', txn)).to.be(true);
