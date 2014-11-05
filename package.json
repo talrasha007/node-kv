@@ -1,6 +1,6 @@
 {
   "name": "node-kv",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "repository": "https://github.com/talrasha007/node-kv.git",
   "description": "An embeded key-value store for node.js, extremely fast.",
   "readmeFile": "README.md",
@@ -18,7 +18,7 @@
     "debug": "^2.1.0",
     "lodash": "^2.4.1",
     "mkdirp": "^0.5.0",
-    "nan": "^1.4.0"
+    "nan": "~1.4.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
