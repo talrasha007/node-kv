@@ -65,6 +65,7 @@ class HistogramImpl {
   virtual double StandardDeviation() const;
   virtual void Data(HistogramData * const data) const;
 
+  HistogramImpl();
   virtual ~HistogramImpl() {}
 
  private:
@@ -75,7 +76,7 @@ class HistogramImpl {
   double num_ = 0;
   double sum_ = 0;
   double sum_squares_ = 0;
-  uint64_t buckets_[138] = {0};  // this is BucketMapper::BucketCount()
+  uint64_t buckets_[138];  // this is BucketMapper::BucketCount()
 };
 
 }  // namespace rocksdb

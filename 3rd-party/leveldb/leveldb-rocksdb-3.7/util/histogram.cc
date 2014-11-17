@@ -73,6 +73,10 @@ namespace {
   const HistogramBucketMapper bucketMapper;
 }
 
+HistogramImpl::HistogramImpl() {
+  memset(buckets_, 0, sizeof buckets_);
+}
+
 void HistogramImpl::Clear() {
   min_ = bucketMapper.LastValue();
   max_ = 0;
