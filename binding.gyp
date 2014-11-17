@@ -8,6 +8,7 @@
       ],
       "dependencies": [
         "<(module_root_dir)/3rd-party/leveldb/leveldb.gyp:leveldb",
+        "<(module_root_dir)/3rd-party/leveldb/rocksdb.gyp:rocksdb",
         "<(module_root_dir)/3rd-party/liblmdb/lmdb.gyp:lmdb"
       ],
       "sources": [

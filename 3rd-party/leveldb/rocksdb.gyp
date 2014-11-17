@@ -28,7 +28,7 @@
         ['OS == "win"', {
             'include_dirs': [
                 'leveldb-<(ldbversion)/port/win'
-              , 'port-libuv/'
+              , 'port-libuv-rocksdb/'
             ]
           , 'defines': [
                 'LEVELDB_PLATFORM_UV=1'
@@ -36,9 +36,9 @@
               , '_HAS_EXCEPTIONS=0'
             ]
           , 'sources': [
-                'port-libuv/port_uv.cc'
-              , 'port-libuv/env_win.cc'
-              , 'port-libuv/win_logger.cc'
+                'port-libuv-rocksdb/port_uv.cc'
+              , 'port-libuv-rocksdb/env_win.cc'
+              , 'port-libuv-rocksdb/win_logger.cc'
             ]
           , 'msvs_settings': {
                 'VCCLCompilerTool': {
@@ -143,8 +143,7 @@
         }]
     ]
   , 'sources': [
-        'leveldb-<(ldbversion)/db/version_set_reduce_num_levels.cc'
-      , 'leveldb-<(ldbversion)/db/db_filesnapshot.cc'
+        'leveldb-<(ldbversion)/db/db_filesnapshot.cc'
       , 'leveldb-<(ldbversion)/db/db_impl_readonly.cc'
       , 'leveldb-<(ldbversion)/db/c.cc'
       , 'leveldb-<(ldbversion)/db/merge_helper.cc'
@@ -154,10 +153,9 @@
       , 'leveldb-<(ldbversion)/db/log_writer.cc'
       , 'leveldb-<(ldbversion)/db/dbformat.cc'
       , 'leveldb-<(ldbversion)/db/write_batch.cc'
-      , 'leveldb-<(ldbversion)/db/memtablelist.cc'
+      , 'leveldb-<(ldbversion)/db/memtable_list.cc'
       , 'leveldb-<(ldbversion)/db/db_impl.cc'
       , 'leveldb-<(ldbversion)/db/memtable.cc'
-      , 'leveldb-<(ldbversion)/db/db_stats_logger.cc'
       , 'leveldb-<(ldbversion)/db/version_edit.cc'
       , 'leveldb-<(ldbversion)/db/version_set.cc'
       , 'leveldb-<(ldbversion)/db/builder.cc'
@@ -169,7 +167,7 @@
       , 'leveldb-<(ldbversion)/helpers/memenv/memenv.cc'
       , 'leveldb-<(ldbversion)/port/stack_trace.cc'
       , 'leveldb-<(ldbversion)/table/merger.cc'
-      , 'leveldb-<(ldbversion)/table/filter_block.cc'
+      , 'leveldb-<(ldbversion)/table/block_based_filter_block.cc'
       , 'leveldb-<(ldbversion)/table/block_based_table_factory.cc'
       , 'leveldb-<(ldbversion)/table/block_based_table_reader.cc'
       , 'leveldb-<(ldbversion)/table/block_builder.cc'
@@ -181,13 +179,11 @@
       , 'leveldb-<(ldbversion)/table/block_based_table_builder.cc'
       , 'leveldb-<(ldbversion)/util/bloom.cc'
       , 'leveldb-<(ldbversion)/util/slice.cc'
-      , 'leveldb-<(ldbversion)/util/build_version.cc'
       , 'leveldb-<(ldbversion)/util/vectorrep.cc'
       , 'leveldb-<(ldbversion)/util/env_posix.cc'
       , 'leveldb-<(ldbversion)/util/env.cc'
       , 'leveldb-<(ldbversion)/util/statistics.cc'
       , 'leveldb-<(ldbversion)/util/histogram.cc'
-      , 'leveldb-<(ldbversion)/util/arena_impl.cc'
       , 'leveldb-<(ldbversion)/util/coding.cc'
       , 'leveldb-<(ldbversion)/util/perf_context.cc'
       , 'leveldb-<(ldbversion)/util/hash.cc'
@@ -195,7 +191,6 @@
       , 'leveldb-<(ldbversion)/util/hash_skiplist_rep.cc'
       , 'leveldb-<(ldbversion)/util/auto_roll_logger.cc'
       , 'leveldb-<(ldbversion)/util/blob_store.cc'
-      , 'leveldb-<(ldbversion)/util/transformrep.cc'
       , 'leveldb-<(ldbversion)/util/filter_policy.cc'
       , 'leveldb-<(ldbversion)/util/murmurhash.cc'
       , 'leveldb-<(ldbversion)/util/cache.cc'
