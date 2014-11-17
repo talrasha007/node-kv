@@ -7,6 +7,9 @@
 #ifndef STORAGE_LEVELDB_PORT_PORT_LIBUV_H_
 #define STORAGE_LEVELDB_PORT_PORT_LIBUV_H_
 
+#define ROCKSDB_THREAD_LOCAL __declspec(thread)
+#define __attribute__(...)
+
 #undef PLATFORM_IS_LITTLE_ENDIAN
 #if defined(OS_MACOSX)
   #include <machine/endian.h>
