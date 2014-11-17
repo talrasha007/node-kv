@@ -24,6 +24,8 @@
 #include <string.h>
 #include <string>
 
+#include "port/port.h"
+
 namespace rocksdb {
 
 class Slice {

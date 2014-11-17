@@ -20,6 +20,18 @@ void Mutex::Lock() { uv_mutex_lock(&mu_); }
 
 void Mutex::Unlock() { uv_mutex_unlock(&mu_); }
 
+RWMutex::RWMutex() { uv_mutex_init(&mu_); }
+
+RWMutex::~RWMutex() { uv_mutex_destroy(&mu_); }
+
+void RWMutex::ReadLock() { uv_mutex_lock(&mu_); }
+
+void RWMutex::WriteLock() { uv_mutex_lock(&mu_); }
+
+void RWMutex::ReadUnlock() { uv_mutex_unlock(&mu_); }
+
+void RWMutex::WriteUnlock() { uv_mutex_unlock(&mu_); }
+
 CondVar::CondVar(Mutex* mu) : mu_(mu) { uv_cond_init(&cv_); }
 
 CondVar::~CondVar() { uv_cond_destroy(&cv_); }

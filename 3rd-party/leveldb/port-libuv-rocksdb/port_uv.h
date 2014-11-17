@@ -26,7 +26,7 @@
   #include <sys/types.h>
   #include <sys/endian.h>
 #elif defined(_MSC_VER)
-  #include "stdint-msvc2008.h"
+  //#include "stdint-msvc2008.h"
   #define PLATFORM_IS_LITTLE_ENDIAN true
   #define snprintf _snprintf
   #define close _close
@@ -35,6 +35,7 @@
   #include <endian.h>
 #endif
 
+#include <stdint.h>
 #include <uv.h>
 
 #ifdef SNAPPY
@@ -92,6 +93,25 @@ class Mutex {
   // No copying
   Mutex(const Mutex&);
   void operator=(const Mutex&);
+};
+
+class RWMutex {
+public:
+	RWMutex();
+	~RWMutex();
+
+	void ReadLock();
+	void WriteLock();
+	void ReadUnlock();
+	void WriteUnlock();
+	void AssertHeld() { }
+
+private:
+	uv_mutex_t mu_; // the underlying platform mutex
+
+	// No copying allowed
+	RWMutex(const RWMutex&);
+	void operator=(const RWMutex&);
 };
 
 class CondVar {

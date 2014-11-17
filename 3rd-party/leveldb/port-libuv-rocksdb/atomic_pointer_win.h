@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <windows.h>
+#undef GetCurrentTime
 
 // credit: https://groups.google.com/forum/#!msg/leveldb/VuECZMnsob4/F6pGPGaK-XwJ
 

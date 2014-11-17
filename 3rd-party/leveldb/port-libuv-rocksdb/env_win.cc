@@ -10,8 +10,8 @@
 #include <deque>
 #include <process.h>
 
-#include "leveldb/env.h"
-#include "leveldb/slice.h"
+#include "rocksdb/env.h"
+#include "rocksdb/slice.h"
 #include "port/port.h"
 #include "util/logging.h"
 #include "win_logger.h"

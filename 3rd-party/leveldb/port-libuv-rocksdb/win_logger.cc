@@ -4,9 +4,7 @@
 
 #include "win_logger.h"
 
-#include <windows.h>
-
-namespace leveldb {
+namespace rocksdb {
 
 void WinLogger::Logv(const char* format, va_list ap) {
   const uint64_t thread_id = static_cast<uint64_t>(::GetCurrentThreadId());
