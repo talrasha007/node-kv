@@ -9,7 +9,7 @@
 #include <string.h>
 #include "util/logging.h"
 
-namespace leveldb {
+namespace rocksdb {
 namespace port {
 
 Mutex::Mutex() { uv_mutex_init(&mu_); }

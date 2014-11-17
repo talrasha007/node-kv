@@ -69,7 +69,7 @@
 #define fdatasync fsync
 #endif
 
-namespace leveldb {
+namespace rocksdb {
 namespace port {
 
 static const bool kLittleEndian = PLATFORM_IS_LITTLE_ENDIAN;
