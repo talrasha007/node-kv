@@ -42,7 +42,7 @@
             ]
           , 'msvs_settings': {
                 'VCCLCompilerTool': {
-                    'RuntimeTypeInfo': 'false'
+                    'RuntimeTypeInfo': 'true'
                   , 'EnableFunctionLevelLinking': 'true'
                   , 'ExceptionHandling': '2'
                   , 'DisableSpecificWarnings': [ '4200', '4355', '4530' ,'4267', '4244', '4717' ]
@@ -127,7 +127,8 @@
                 'OS_MACOSX=1'
             ]
           , 'xcode_settings': {
-                'WARNING_CFLAGS': [
+                'GCC_ENABLE_CPP_RTTI': 'YES'
+              , 'WARNING_CFLAGS': [
                     '-Wno-sign-compare'
                   , '-Wno-unused-variable'
                   , '-Wno-unused-function'
