@@ -18,7 +18,7 @@
 
 #if defined(LEVELDB_PLATFORM_UV)
 #  include "port_uv.h"
-#elif defined(LEVELDB_PLATFORM_POSIX)
+#elif defined(ROCKSDB_PLATFORM_POSIX)
 #  include "port/port_posix.h"
 #endif
 
