@@ -23,7 +23,7 @@ namespace rocksdb {
 
 class Logger;
 
-const size_t kInlineSize = 2048;
+enum { kInlineSize = 2048 };
 
 class Arena {
  public:
@@ -31,7 +31,7 @@ class Arena {
   Arena(const Arena&) = delete;
   void operator=(const Arena&) = delete;
 
-  static const size_t kInlineSize = 2048;
+  enum { kInlineSize = 2048 };
   static const size_t kMinBlockSize;
   static const size_t kMaxBlockSize;
 

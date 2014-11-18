@@ -8,13 +8,14 @@
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 #include "util/arena.h"
+#ifndef _MSC_VER
 #include <sys/mman.h>
+#endif
 #include <algorithm>
 #include "rocksdb/env.h"
 
 namespace rocksdb {
 
-const size_t Arena::kInlineSize;
 const size_t Arena::kMinBlockSize = 4096;
 const size_t Arena::kMaxBlockSize = 2 << 30;
 static const int kAlignUnit = sizeof(void*);
