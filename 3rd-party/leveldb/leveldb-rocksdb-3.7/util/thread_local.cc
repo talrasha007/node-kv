@@ -16,7 +16,7 @@ namespace rocksdb {
 
 port::Mutex ThreadLocalPtr::StaticMeta::mutex_;
 #if !defined(OS_MACOSX)
-__thread ThreadLocalPtr::ThreadData* ThreadLocalPtr::StaticMeta::tls_ = nullptr;
+ROCKSDB_THREAD_LOCAL ThreadLocalPtr::ThreadData* ThreadLocalPtr::StaticMeta::tls_ = nullptr;
 #endif
 
 ThreadLocalPtr::StaticMeta* ThreadLocalPtr::Instance() {
@@ -29,7 +29,9 @@ void ThreadLocalPtr::StaticMeta::OnThreadExit(void* ptr) {
   assert(tls != nullptr);
 
   auto* inst = Instance();
+#ifndef _MSC_VER
   pthread_setspecific(inst->pthread_key_, nullptr);
+#endif
 
   MutexLock l(&mutex_);
   inst->RemoveThreadData(tls);
@@ -50,9 +52,11 @@ void ThreadLocalPtr::StaticMeta::OnThreadExit(void* ptr) {
 }
 
 ThreadLocalPtr::StaticMeta::StaticMeta() : next_instance_id_(0) {
+#ifndef _MSC_VER
   if (pthread_key_create(&pthread_key_, &OnThreadExit) != 0) {
     throw std::runtime_error("pthread_key_create failed");
   }
+#endif
   head_.next = &head_;
   head_.prev = &head_;
 }
@@ -92,6 +96,7 @@ ThreadLocalPtr::ThreadData* ThreadLocalPtr::StaticMeta::GetThreadLocal() {
     }
     // Even it is not OS_MACOSX, need to register value for pthread_key_ so that
     // its exit handler will be triggered.
+#ifndef _MSC_VER
     if (pthread_setspecific(inst->pthread_key_, tls_) != 0) {
       {
         MutexLock l(&mutex_);
@@ -100,6 +105,7 @@ ThreadLocalPtr::ThreadData* ThreadLocalPtr::StaticMeta::GetThreadLocal() {
       delete tls_;
       throw std::runtime_error("pthread_setspecific failed");
     }
+#endif
   }
   return tls_;
 }

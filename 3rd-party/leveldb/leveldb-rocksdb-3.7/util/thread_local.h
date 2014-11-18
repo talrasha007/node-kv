@@ -156,7 +156,9 @@ class ThreadLocalPtr {
 #endif
     // Used to make thread exit trigger possible if !defined(OS_MACOSX).
     // Otherwise, used to retrieve thread data.
+#ifndef _MSC_VER
     pthread_key_t pthread_key_;
+#endif
   };
 
   static StaticMeta* Instance();
