@@ -26,7 +26,7 @@
   #include <sys/types.h>
   #include <sys/endian.h>
 #elif defined(_MSC_VER)
-  #include "stdint-msvc2008.h"
+  //#include "stdint-msvc2008.h"
   #define PLATFORM_IS_LITTLE_ENDIAN true
   #define snprintf _snprintf
   #define close _close
