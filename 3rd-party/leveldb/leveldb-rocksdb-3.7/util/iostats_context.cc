@@ -10,7 +10,7 @@
 namespace rocksdb {
 
 #ifndef IOS_CROSS_COMPILE
-__thread IOStatsContext iostats_context;
+ROCKSDB_THREAD_LOCAL IOStatsContext iostats_context;
 #endif  // IOS_CROSS_COMPILE
 
 void IOStatsContext::Reset() {
