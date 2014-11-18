@@ -177,6 +177,7 @@ struct BlockContents {
     cachable = r.cachable;
     compression_type = r.compression_type;
     allocation.reset(r.allocation.release());
+    return *this;
   }
 
   BlockContents(const Slice& _data, bool _cachable,
