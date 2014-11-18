@@ -4,6 +4,9 @@
  * See also http://blog.kowalczyk.info/software/leveldb-for-windows/index.html
  */
 
+#pragma comment(lib,"Ws2_32.lib")
+#pragma comment(lib,"Rpcrt4.lib")
+
 #include <io.h>
 #include <direct.h>
 #include <stdio.h>
@@ -861,6 +864,17 @@ void WinEnv::StartThread(void (*function)(void* arg), void* arg) {
 static Env* default_env;
 static void InitDefaultEnv() { default_env = new WinEnv(); }
 static rocksdb::port::Mutex default_env_mutex;
+
+std::string Env::GenerateUniqueId() {
+	UUID uuid;
+	UuidCreate(&uuid);
+	unsigned char* str = NULL;
+	UuidToStringA(&uuid, &str);
+
+	std::string ret((char*)str);
+	RpcStringFreeA(&str);
+	return ret;
+}
 
 Env* Env::Default() {
   default_env_mutex.Lock();
