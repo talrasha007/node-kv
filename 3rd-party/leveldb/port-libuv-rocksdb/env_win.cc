@@ -200,7 +200,7 @@ public:
   explicit WinDirectory(int fd) : fd_(fd) {}
   ~WinDirectory() { close(fd_); }
 
-  virtual Status Fsync() { }
+  virtual Status Fsync() { return Status::OK(); }
 
 private:
   int fd_;
