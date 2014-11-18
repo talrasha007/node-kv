@@ -7,7 +7,9 @@
 #pragma once
 #include <algorithm>
 #include <stdio.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <time.h>
 #include <iostream>
 #include "rocksdb/env.h"

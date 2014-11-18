@@ -180,7 +180,6 @@
       , 'leveldb-<(ldbversion)/util/bloom.cc'
       , 'leveldb-<(ldbversion)/util/slice.cc'
       , 'leveldb-<(ldbversion)/util/vectorrep.cc'
-      , 'leveldb-<(ldbversion)/util/env_posix.cc'
       , 'leveldb-<(ldbversion)/util/env.cc'
       , 'leveldb-<(ldbversion)/util/statistics.cc'
       , 'leveldb-<(ldbversion)/util/histogram.cc'

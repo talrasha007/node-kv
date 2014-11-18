@@ -13,14 +13,17 @@
 #pragma once
 #include <algorithm>
 #include <stdio.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#include <unistd.h>
+#endif
 #include <time.h>
 #include <fcntl.h>
-#include <unistd.h>
 #ifdef OS_LINUX
 #include <linux/falloc.h>
 #endif
 #include "rocksdb/env.h"
+#include "port/port.h"
 #include <atomic>
 
 namespace rocksdb {

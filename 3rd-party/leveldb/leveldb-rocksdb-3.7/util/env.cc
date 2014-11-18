@@ -9,7 +9,9 @@
 
 #include "rocksdb/env.h"
 
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include "rocksdb/options.h"
 #include "util/arena.h"
 #include "util/autovector.h"
