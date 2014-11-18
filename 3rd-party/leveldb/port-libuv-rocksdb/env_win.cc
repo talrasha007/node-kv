@@ -197,13 +197,13 @@ public:
 
 class WinDirectory : public Directory {
 public:
-	explicit WinDirectory(int fd) : fd_(fd) {}
-	~WinDirectory() { close(fd_); }
+  explicit WinDirectory(int fd) : fd_(fd) {}
+  ~WinDirectory() { close(fd_); }
 
-	virtual Status Fsync() { }
+  virtual Status Fsync() { }
 
 private:
-	int fd_;
+  int fd_;
 };
 
 namespace {
@@ -394,79 +394,79 @@ class WinEnv : public Env {
   }
 
   virtual Status NewDirectory(const std::string& name, unique_ptr<Directory>* result) {
-	  result->reset();
-	  const int fd = open(name.c_str(), 0);
-	  if (fd < 0) {
-		  return IOError(name, errno);
-	  }
-	  else {
-		  result->reset(new WinDirectory(fd));
-	  }
-	  return Status::OK();
+    result->reset();
+    const int fd = open(name.c_str(), 0);
+    if (fd < 0) {
+      return IOError(name, errno);
+    }
+    else {
+      result->reset(new WinDirectory(fd));
+    }
+    return Status::OK();
   }
 
   virtual Status CreateDirIfMissing(const std::string& dirname) {
-	  Status result;
+    Status result;
 
-	  int err = mkdir(dirname.c_str());
-	  if (err != 0 && err != EEXIST) {
-		  result = IOError(dirname, errno);
-	  } else if (!DirExists(dirname.c_str())) {
-		  result = Status::IOError("`" + dirname + "' exists but is not a directory");
-	  }
+    int err = mkdir(dirname.c_str());
+    if (err != 0 && err != EEXIST) {
+      result = IOError(dirname, errno);
+    } else if (!DirExists(dirname.c_str())) {
+      result = Status::IOError("`" + dirname + "' exists but is not a directory");
+    }
 
-	  return result;
+    return result;
   }
 
   virtual Status GetFileModificationTime(const std::string& fname, uint64_t* file_mtime) {
-	  Status result;
+    Status result;
 
-	  int err = rmdir(fname.c_str());
-	  if (err != 0) {
-		  result = IOError(fname, err);
-	  }
+    int err = rmdir(fname.c_str());
+    if (err != 0) {
+      result = IOError(fname, err);
+    }
 
-	  return result;
+    return result;
   }
 
   virtual Status GetHostName(char* name, uint64_t len) {
-	  int ret = gethostname(name, len);
-	  if (ret < 0) {
-		  if (errno == EFAULT || errno == EINVAL)
-			  return Status::InvalidArgument(strerror(errno));
-		  else
-			  return IOError("GetHostName", errno);
-	  }
-	  return Status::OK();
+    int ret = gethostname(name, len);
+    if (ret < 0) {
+      if (errno == EFAULT || errno == EINVAL)
+        return Status::InvalidArgument(strerror(errno));
+      else
+        return IOError("GetHostName", errno);
+    }
+    return Status::OK();
   }
 
   virtual Status GetCurrentTime(int64_t* unix_time) {
-	  time_t ret = time(nullptr);
-	  if (ret == (time_t)-1) {
-		  return IOError("GetCurrentTime", errno);
-	  }
-	  *unix_time = (int64_t)ret;
-	  return Status::OK();
+    time_t ret = time(nullptr);
+    if (ret == (time_t)-1) {
+      return IOError("GetCurrentTime", errno);
+    }
+    *unix_time = (int64_t)ret;
+    return Status::OK();
   }
 
   virtual Status GetAbsolutePath(const std::string& db_path, std::string* output_path) {
-	  if (db_path.find('/') == 0) {
-		  *output_path = db_path;
-		  return Status::OK();
-	  }
+    if (db_path.find('/') == 0) {
+      *output_path = db_path;
+      return Status::OK();
+    }
 
-	  char the_path[256];
-	  char* ret = getcwd(the_path, 256);
-	  if (ret == nullptr) {
-		  return Status::IOError(strerror(errno));
-	  }
+    char the_path[256];
+    char* ret = getcwd(the_path, 256);
+    if (ret == nullptr) {
+      return Status::IOError(strerror(errno));
+    }
 
-	  *output_path = ret;
-	  return Status::OK();
+    *output_path = ret;
+    return Status::OK();
   }
 
   virtual void Schedule(void(*function)(void* arg), void* arg, Priority pri = LOW) {
-	  QueueUserWorkItem(LPTHREAD_START_ROUTINE(function), arg, 0);
+    QueueUserWorkItem(LPTHREAD_START_ROUTINE(function), arg, 0);
   }
 
   virtual void SetBackgroundThreads(int number, Priority pri = LOW) {}
@@ -474,23 +474,23 @@ class WinEnv : public Env {
   virtual void IncBackgroundThreadsIfNeeded(int number, Priority pri) {}
 
   virtual std::string TimeToString(uint64_t secondsSince1970) {
-	  const time_t seconds = (time_t)secondsSince1970;
-	  struct tm t;
-	  int maxsize = 64;
-	  std::string dummy;
-	  dummy.reserve(maxsize);
-	  dummy.resize(maxsize);
-	  char* p = &dummy[0];
-	  localtime_r(&seconds, &t);
-	  snprintf(p, maxsize,
-		  "%04d/%02d/%02d-%02d:%02d:%02d ",
-		  t.tm_year + 1900,
-		  t.tm_mon + 1,
-		  t.tm_mday,
-		  t.tm_hour,
-		  t.tm_min,
-		  t.tm_sec);
-	  return dummy;
+    const time_t seconds = (time_t)secondsSince1970;
+    struct tm t;
+    int maxsize = 64;
+    std::string dummy;
+    dummy.reserve(maxsize);
+    dummy.resize(maxsize);
+    char* p = &dummy[0];
+    localtime_r(&seconds, &t);
+    snprintf(p, maxsize,
+      "%04d/%02d/%02d-%02d:%02d:%02d ",
+      t.tm_year + 1900,
+      t.tm_mon + 1,
+      t.tm_mday,
+      t.tm_hour,
+      t.tm_min,
+      t.tm_sec);
+    return dummy;
   }
 
   virtual bool FileExists(const std::string& fname) {
@@ -574,12 +574,12 @@ class WinEnv : public Env {
   }
 
   bool DirExists(const char *dir) {
-	  WIN32_FILE_ATTRIBUTE_DATA   file_info;
-	  BOOL res = GetFileAttributesEx(dir, GetFileExInfoStandard, &file_info);
-	  if (0 == res)
-		  return false;
+    WIN32_FILE_ATTRIBUTE_DATA   file_info;
+    BOOL res = GetFileAttributesEx(dir, GetFileExInfoStandard, &file_info);
+    if (0 == res)
+      return false;
 
-	  return (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    return (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
   }
 
 
