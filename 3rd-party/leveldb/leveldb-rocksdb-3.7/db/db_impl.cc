@@ -13,6 +13,7 @@
 #define __STDC_FORMAT_MACROS
 #endif
 
+#include <memory>
 #include <inttypes.h>
 #include <algorithm>
 #include <climits>
@@ -3121,9 +3122,9 @@ Status DBImpl::GetDbIdentity(std::string& identity) {
   if (!s.ok()) {
     return s;
   }
-  char buffer[file_size];
+  std::unique_ptr<char> buffer(new char[file_size]);
   Slice id;
-  s = idfile->Read(file_size, &id, buffer);
+  s = idfile->Read(file_size, &id, buffer.get());
   if (!s.ok()) {
     return s;
   }
