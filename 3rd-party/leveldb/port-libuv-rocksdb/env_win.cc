@@ -4,7 +4,8 @@
  * See also http://blog.kowalczyk.info/software/leveldb-for-windows/index.html
  */
 
-
+#include <io.h>
+#include <direct.h>
 #include <stdio.h>
 #include <string.h>
 #include <deque>
@@ -15,12 +16,6 @@
 #include "port/port.h"
 #include "util/logging.h"
 #include "win_logger.h"
-
-#if defined(_MSC_VER)
-#  ifdef DeleteFile
-#  undef DeleteFile
-#  endif
-#endif
 
 // To properly support file names on Windows we should be using Unicode
 // (WCHAR) strings. To accomodate existing interface which uses std::string,
@@ -34,7 +29,7 @@
 // and for those that do, the caller needs to be aware of this convention
 // whenever it bubbles up to the user-level API.
 
-namespace leveldb {
+namespace rocksdb {
 
 static Status IOError(const std::string& context, DWORD err = (DWORD)-1) {
   char *err_msg = NULL;
@@ -152,6 +147,63 @@ public:
       return IOError(name_);
     return Status::OK();
   }
+};
+
+class WinRandomRWFile : public RandomRWFile {
+private:
+  std::string fname_;
+  HANDLE file_;
+
+public:
+  WinRandomRWFile(const std::string& fname, HANDLE file)
+    : fname_(fname), file_(file) { }
+  virtual ~WinRandomRWFile() { CloseHandle(file_); }
+
+  virtual Status Sync() {
+    BOOL ok = FlushFileBuffers(file_);
+    if (!ok)
+      return IOError(fname_);
+    return Status::OK();
+  }
+
+  virtual Status Close() {
+    if (INVALID_HANDLE_VALUE == file_)
+      return Status::OK();
+    Status s = Sync();
+    CloseHandle(file_);
+    file_ = INVALID_HANDLE_VALUE;
+    return s;
+  }
+
+  virtual Status Read(uint64_t offset, size_t n, Slice* result, char* scratch) const {
+    OVERLAPPED overlapped = { 0 };
+    overlapped.Offset = static_cast<DWORD>(offset);
+    overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
+    DWORD bytes_read = 0;
+    BOOL success = ReadFile(file_, scratch, n, &bytes_read, &overlapped);
+    *result = Slice(scratch, bytes_read);
+    return success != FALSE ? Status::OK() : Status::IOError(fname_);
+  }
+
+  virtual Status Write(uint64_t offset, const Slice& data) {
+    OVERLAPPED overlapped = { 0 };
+    overlapped.Offset = static_cast<DWORD>(offset);
+    overlapped.OffsetHigh = static_cast<DWORD>(offset >> 32);
+    DWORD bytes_written = 0;
+    BOOL success = WriteFile(file_, data.data(), data.size(), &bytes_written, &overlapped);
+    return success != FALSE ? Status::OK() : Status::IOError(fname_);
+  }
+};
+
+class WinDirectory : public Directory {
+public:
+	explicit WinDirectory(int fd) : fd_(fd) {}
+	~WinDirectory() { close(fd_); }
+
+	virtual Status Fsync() { }
+
+private:
+	int fd_;
 };
 
 namespace {
@@ -276,7 +328,8 @@ class WinEnv : public Env {
   }
 
   virtual Status NewSequentialFile(const std::string& fname,
-                                   SequentialFile** result) {
+                   unique_ptr<SequentialFile>* result,
+                   const EnvOptions& options) {
     *result = NULL;
     WCHAR *file_name = ToWcharPermissive(fname.c_str());
     if (file_name == NULL) {
@@ -287,12 +340,13 @@ class WinEnv : public Env {
     if (h == INVALID_HANDLE_VALUE) {
       return IOError(fname);
     }
-    *result = new WinSequentialFile(fname, h);
+    result->reset(new WinSequentialFile(fname, h));
     return Status::OK();
   }
 
   virtual Status NewRandomAccessFile(const std::string& fname,
-                   RandomAccessFile** result) {
+                   unique_ptr<RandomAccessFile>* result,
+                   const EnvOptions& options) {
     *result = NULL;
     WCHAR *file_name = ToWcharPermissive(fname.c_str());
     if (file_name == NULL) {
@@ -303,12 +357,13 @@ class WinEnv : public Env {
     if (h == INVALID_HANDLE_VALUE) {
       return IOError(fname);
     }
-    *result = new WinRandomAccessFile(fname, h);
+    result->reset(new WinRandomAccessFile(fname, h));
     return Status::OK();
   }
 
   virtual Status NewWritableFile(const std::string& fname,
-                 WritableFile** result) {
+                   unique_ptr<WritableFile>* result,
+                   const EnvOptions& options) {
     *result = NULL;
     WCHAR *file_name = ToWcharPermissive(fname.c_str());
     if (file_name == NULL)
@@ -318,8 +373,124 @@ class WinEnv : public Env {
     if (h == INVALID_HANDLE_VALUE) {
       return IOError(fname);
     }
-    *result = new WinWritableFile(fname, h);
+    result->reset(new WinWritableFile(fname, h));
     return Status::OK();
+  }
+
+  virtual Status NewRandomRWFile(const std::string& fname,
+    unique_ptr<RandomRWFile>* result,
+    const EnvOptions& options) {
+    *result = NULL;
+    WCHAR *file_name = ToWcharPermissive(fname.c_str());
+    if (file_name == NULL)
+      return Status::InvalidArgument("Invalid file name");
+    HANDLE h = CreateFileW(file_name, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    free((void*)file_name);
+    if (h == INVALID_HANDLE_VALUE) {
+      return IOError(fname);
+    }
+    result->reset(new WinRandomRWFile(fname, h));
+    return Status::OK();
+  }
+
+  virtual Status NewDirectory(const std::string& name, unique_ptr<Directory>* result) {
+	  result->reset();
+	  const int fd = open(name.c_str(), 0);
+	  if (fd < 0) {
+		  return IOError(name, errno);
+	  }
+	  else {
+		  result->reset(new WinDirectory(fd));
+	  }
+	  return Status::OK();
+  }
+
+  virtual Status CreateDirIfMissing(const std::string& dirname) {
+	  Status result;
+
+	  int err = mkdir(dirname.c_str());
+	  if (err != 0 && err != EEXIST) {
+		  result = IOError(dirname, errno);
+	  } else if (!DirExists(dirname.c_str())) {
+		  result = Status::IOError("`" + dirname + "' exists but is not a directory");
+	  }
+
+	  return result;
+  }
+
+  virtual Status GetFileModificationTime(const std::string& fname, uint64_t* file_mtime) {
+	  Status result;
+
+	  int err = rmdir(fname.c_str());
+	  if (err != 0) {
+		  result = IOError(fname, err);
+	  }
+
+	  return result;
+  }
+
+  virtual Status GetHostName(char* name, uint64_t len) {
+	  int ret = gethostname(name, len);
+	  if (ret < 0) {
+		  if (errno == EFAULT || errno == EINVAL)
+			  return Status::InvalidArgument(strerror(errno));
+		  else
+			  return IOError("GetHostName", errno);
+	  }
+	  return Status::OK();
+  }
+
+  virtual Status GetCurrentTime(int64_t* unix_time) {
+	  time_t ret = time(nullptr);
+	  if (ret == (time_t)-1) {
+		  return IOError("GetCurrentTime", errno);
+	  }
+	  *unix_time = (int64_t)ret;
+	  return Status::OK();
+  }
+
+  virtual Status GetAbsolutePath(const std::string& db_path, std::string* output_path) {
+	  if (db_path.find('/') == 0) {
+		  *output_path = db_path;
+		  return Status::OK();
+	  }
+
+	  char the_path[256];
+	  char* ret = getcwd(the_path, 256);
+	  if (ret == nullptr) {
+		  return Status::IOError(strerror(errno));
+	  }
+
+	  *output_path = ret;
+	  return Status::OK();
+  }
+
+  virtual void Schedule(void(*function)(void* arg), void* arg, Priority pri = LOW) {
+	  QueueUserWorkItem(LPTHREAD_START_ROUTINE(function), arg, 0);
+  }
+
+  virtual void SetBackgroundThreads(int number, Priority pri = LOW) {}
+
+  virtual void IncBackgroundThreadsIfNeeded(int number, Priority pri) {}
+
+  virtual std::string TimeToString(uint64_t secondsSince1970) {
+	  const time_t seconds = (time_t)secondsSince1970;
+	  struct tm t;
+	  int maxsize = 64;
+	  std::string dummy;
+	  dummy.reserve(maxsize);
+	  dummy.resize(maxsize);
+	  char* p = &dummy[0];
+	  localtime_r(&seconds, &t);
+	  snprintf(p, maxsize,
+		  "%04d/%02d/%02d-%02d:%02d:%02d ",
+		  t.tm_year + 1900,
+		  t.tm_mon + 1,
+		  t.tm_mday,
+		  t.tm_hour,
+		  t.tm_min,
+		  t.tm_sec);
+	  return dummy;
   }
 
   virtual bool FileExists(const std::string& fname) {
@@ -401,6 +572,16 @@ class WinEnv : public Env {
 
     return (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
   }
+
+  bool DirExists(const char *dir) {
+	  WIN32_FILE_ATTRIBUTE_DATA   file_info;
+	  BOOL res = GetFileAttributesEx(dir, GetFileExInfoStandard, &file_info);
+	  if (0 == res)
+		  return false;
+
+	  return (file_info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+  }
+
 
   WCHAR *WstrDupN(const WCHAR *s, size_t len) {
       void *res = malloc((len + 1) * sizeof(WCHAR));
@@ -568,12 +749,12 @@ class WinEnv : public Env {
     return Status::OK();
   }
 
-  virtual Status NewLogger(const std::string& fname, Logger** result) {
+  virtual Status NewLogger(const std::string& fname, shared_ptr<Logger>* result) {
     *result = NULL;
     FILE* f = fopen(fname.c_str(), "wt");
     if (f == NULL)
       return Status::IOError(fname, strerror(errno));
-    *result = new WinLogger(f);
+    result->reset(new WinLogger(f));
     return Status::OK();
   }
 
@@ -600,8 +781,8 @@ private:
     return 0;
   }
 
-  leveldb::port::Mutex mu_;
-  leveldb::port::CondVar bgsignal_;
+  rocksdb::port::Mutex mu_;
+  rocksdb::port::CondVar bgsignal_;
   HANDLE  bgthread_;
 
   // Entry per Schedule() call
@@ -679,7 +860,7 @@ void WinEnv::StartThread(void (*function)(void* arg), void* arg) {
 
 static Env* default_env;
 static void InitDefaultEnv() { default_env = new WinEnv(); }
-static leveldb::port::Mutex default_env_mutex;
+static rocksdb::port::Mutex default_env_mutex;
 
 Env* Env::Default() {
   default_env_mutex.Lock();
