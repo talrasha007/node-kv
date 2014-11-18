@@ -7,6 +7,7 @@
 #ifndef STORAGE_LEVELDB_PORT_PORT_LIBUV_H_
 #define STORAGE_LEVELDB_PORT_PORT_LIBUV_H_
 
+#define	munmap(ptr,len)	UnmapViewOfFile(ptr)
 #define ROCKSDB_THREAD_LOCAL __declspec(thread)
 #define __attribute__(...)
 
@@ -476,7 +477,7 @@ inline bool GetHeapProfile(void (*func)(void*, const char*, int), void* arg) {
 #define CACHE_LINE_SIZE 64U
 
 #define PREFETCH(addr, rw, locality)
-#define pthread_key_t int
+//#define pthread_key_t int
 
 } // namespace port
 } // namespace leveldb
