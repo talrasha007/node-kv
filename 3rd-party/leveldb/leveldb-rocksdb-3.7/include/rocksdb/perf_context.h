@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "port/port.h"
+
 namespace rocksdb {
 
 enum PerfLevel {
@@ -70,7 +72,7 @@ struct PerfContext {
 #if defined(NPERF_CONTEXT) || defined(IOS_CROSS_COMPILE)
 extern PerfContext perf_context;
 #else
-extern __thread PerfContext perf_context;
+extern ROCKSDB_THREAD_LOCAL PerfContext perf_context;
 #endif
 
 }

@@ -14,8 +14,8 @@ PerfLevel perf_level = kEnableCount;
 // This is a dummy variable since some place references it
 PerfContext perf_context;
 #else
-__thread PerfLevel perf_level = kEnableCount;
-__thread PerfContext perf_context;
+ROCKSDB_THREAD_LOCAL PerfLevel perf_level = kEnableCount;
+ROCKSDB_THREAD_LOCAL PerfContext perf_context;
 #endif
 
 void SetPerfLevel(PerfLevel level) {

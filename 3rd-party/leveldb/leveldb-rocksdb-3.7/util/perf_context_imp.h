@@ -19,7 +19,7 @@ namespace rocksdb {
 
 #else
 
-extern __thread PerfLevel perf_level;
+extern ROCKSDB_THREAD_LOCAL PerfLevel perf_level;
 
 class PerfStepTimer {
  public:

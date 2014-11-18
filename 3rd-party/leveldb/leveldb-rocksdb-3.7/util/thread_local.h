@@ -15,7 +15,7 @@
 #include <vector>
 
 #include "util/autovector.h"
-#include "port/port_posix.h"
+#include "port/port.h"
 #include "util/thread_local.h"
 
 namespace rocksdb {
@@ -152,7 +152,7 @@ class ThreadLocalPtr {
     static port::Mutex mutex_;
 #if !defined(OS_MACOSX)
     // Thread local storage
-    static __thread ThreadData* tls_;
+    static ROCKSDB_THREAD_LOCAL ThreadData* tls_;
 #endif
     // Used to make thread exit trigger possible if !defined(OS_MACOSX).
     // Otherwise, used to retrieve thread data.
