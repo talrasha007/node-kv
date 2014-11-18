@@ -165,6 +165,20 @@ struct BlockContents {
 
   BlockContents() : cachable(false), compression_type(kNoCompression) {}
 
+  BlockContents(BlockContents&& r)
+  : data(r.data),
+    cachable(r.cachable),
+    compression_type(r.compression_type) {
+    allocation.reset(r.allocation.release());
+  }
+
+  BlockContents& operator=(BlockContents&& r) {
+    data = r.data;
+    cachable = r.cachable;
+    compression_type = r.compression_type;
+    allocation.reset(r.allocation.release());
+  }
+
   BlockContents(const Slice& _data, bool _cachable,
                 CompressionType _compression_type)
       : data(_data), cachable(_cachable), compression_type(_compression_type) {}
