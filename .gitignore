@@ -25,6 +25,9 @@ Release
 *.sln
 *.vcxproj
 *.vcxproj.filters
+*.suo
+*.sdf
+*.opensdf
 
 # Dependency directory
 # Commenting this out is preferred by some people, see
