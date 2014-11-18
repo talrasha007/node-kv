@@ -23,8 +23,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <string>
-
-#include "port/port.h"
+#include <stdio.h>
 
 namespace rocksdb {
 
@@ -76,7 +75,11 @@ class Slice {
       std::string result;
       char buf[10];
       for (size_t i = 0; i < size_; i++) {
+#ifdef _MSC_VER
+        _snprintf(buf, 10, "%02X", (unsigned char)data_[i]);
+#else
         snprintf(buf, 10, "%02X", (unsigned char)data_[i]);
+#endif
         result += buf;
       }
       return result;
