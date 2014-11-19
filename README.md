@@ -6,6 +6,8 @@ I test it on:
   Windows + VS2013
   CentOS 6.5 + gcc 4.8.1
   MacOS
+  
+If your compiler doesn't support C++11, you can install 0.2.x instead.
 ```
 
 [中文文档猛戳此处](https://github.com/talrasha007/node-kv/blob/master/README.zhcn.md)
