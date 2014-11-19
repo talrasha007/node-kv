@@ -189,6 +189,7 @@ for (var i = cur.first(); i; i = cur.next()) {
 ```
 
 ### - RocksDB
+Facebook [rocksdb](http://rocksdb.org/) wrapper.
 ```js
 var path = require('path'),
     rocksdb = require('node-kv').rocksdb;
