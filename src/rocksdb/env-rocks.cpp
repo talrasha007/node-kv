@@ -39,6 +39,7 @@ NAN_METHOD(env::open) {
 
 	Options opt;
 	opt.create_if_missing = true;
+	opt.create_missing_column_families = true;
 	if (args[1]->IsNumber()) opt.write_buffer_size = size_t(args[1]->NumberValue());
 
 	Status s = DB::Open(opt, *path, envw->_desc, &envw->_handles, &pdb);
