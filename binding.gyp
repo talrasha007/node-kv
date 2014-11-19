@@ -22,7 +22,12 @@
         "src/leveldb/setup-lvl.cpp",
         "src/leveldb/db-lvl.cpp",
         "src/leveldb/cursor-lvl.cpp",
-        "src/leveldb/batch-lvl.cpp"
+        "src/leveldb/batch-lvl.cpp",
+        "src/rocksdb/setup-rocks.cpp",
+        "src/rocksdb/env-rocks.cpp",
+        "src/rocksdb/db-rocks.cpp",
+        "src/rocksdb/cursor-rocks.cpp",
+        "src/rocksdb/batch-rocks.cpp"
       ],
       "conditions": [
         [
