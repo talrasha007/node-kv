@@ -1,9 +1,16 @@
 #node-kv
 一个嵌入式的kv存储引擎，特点就是灰常快。
+```
+由于RocksDB大量使用了C++11特性，所以你需要一个支持C++11特性的编译器来编译。
+我已在下列平台编译过：
+  Windows + VS2013
+  CentOS + gcc 4.8.1
+  MacOS
+```
 
 # 特性
 - 多个kv引擎的支持(LMDB / LevelDB / RocksDB(WIP))
-- 高速
+- 高速 (几乎达到C++版本的性能)
 - 方便
 - 即将支持bit-vector运算，会是做bitmap index的一个不错的选择。
 
@@ -158,6 +165,40 @@ var db = env.openDb({
     keyType: 'int32',
     valType: 'int32'
 });
+
+db.put(1, 1);
+console.log(db.get(1));
+db.del(1);
+console.log(db.get(1));
+
+db.del(3);
+db.batchPut(3, 4);
+console.log(db.get(3));
+db.flushBatchOps();
+console.log(db.get(3));
+
+var cur = db.cursor();
+for (var i = cur.first(); i; i = cur.next()) {
+    console.log([cur.key(), cur.val()]);
+}
+```
+### - RocksDB
+```js
+var path = require('path'),
+    rocksdb = require('node-kv').rocksdb;
+
+var env = new rocksdb.Env({
+    dir: path.join(__dirname, 'testdb', 'rocks'),
+    cacheSize: 256 * 1024 * 1024 // 4MB by default.
+});
+
+var db = env.registerDb({
+    name: 'test',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+env.open();
 
 db.put(1, 1);
 console.log(db.get(1));
