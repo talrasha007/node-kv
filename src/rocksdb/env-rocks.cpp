@@ -52,7 +52,7 @@ NAN_METHOD(env::open) {
 }
 
 env::env() : _db(NULL) {
-
+	_desc.push_back(ColumnFamilyDescriptor(kDefaultColumnFamilyName, ColumnFamilyOptions()));
 }
 
 env::~env() {
