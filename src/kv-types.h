@@ -113,6 +113,31 @@ namespace kv {
 		sprintf(buf, "%lld", (long long int)_val);
 		return NanNew(buf);
 	}
+
+	template<class T, class CT, class ST> struct lvl_rocks_comparator {
+		static CT* get_cmp() { return NULL; }
+	};
+
+	template<class N, class CT, class ST> struct lvl_rocks_comparator<number_type<N>, CT, ST> : public CT{
+		static CT* get_cmp() {
+			static lvl_rocks_comparator cmp;
+			return &cmp;
+		}
+
+		typedef number_type<N> key_type;
+
+		int Compare(const ST& a, const ST& b) const {
+			key_type ka(a.data(), a.size()), kb(b.data(), b.size());
+			return ka.compare(kb);
+		}
+
+		const char* Name() const {
+			return key_type::type_name;
+		}
+
+		void FindShortestSeparator(std::string*, const ST&) const { }
+		void FindShortSuccessor(std::string*) const { }
+	};
 }
 
 #define KV_VALTYPE_EACH(KT, EXP) \

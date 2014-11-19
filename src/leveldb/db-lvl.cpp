@@ -11,31 +11,6 @@ using namespace v8;
 using namespace kv;
 using namespace kv::level;
 
-template<class T, class CT, class ST> struct lvl_comparator {
-	static CT* get_cmp() { return NULL; }
-};
-
-template<class N, class CT, class ST> struct lvl_comparator<number_type<N>, CT, ST> : public CT {
-	static CT* get_cmp() {
-		static lvl_comparator cmp;
-		return &cmp;
-	}
-
-	typedef number_type<N> key_type;
-
-	int Compare(const ST& a, const ST& b) const {
-		key_type ka(a.data(), a.size()), kb(b.data(), b.size());
-		return ka.compare(kb);
-	}
-
-	const char* Name() const {
-		return key_type::type_name;
-	}
-
-	void FindShortestSeparator(std::string*, const leveldb::Slice&) const { }
-	void FindShortSuccessor(std::string*) const { }
-};
-
 #define DB_EXPORT(KT, VT) db<KT, VT>::setup_export(exports);
 void kv::level::setup_db_export(v8::Handle<v8::Object>& exports) {
 	KV_TYPE_EACH(DB_EXPORT);
@@ -72,7 +47,7 @@ KVDB_METHOD(ctor) {
 	option_type opt;
 	if (args[1]->IsNumber()) opt.block_cache = leveldb::NewLRUCache(size_t(args[1]->NumberValue()));
 	opt.create_if_missing = true;
-	typedef lvl_comparator<K, comparator_type, slice_type> cmp;
+	typedef lvl_rocks_comparator<K, comparator_type, slice_type> cmp;
 	if (cmp::get_cmp()) opt.comparator = cmp::get_cmp();
 
 	status_type s = db_type::Open(opt, *path, &pdb);
