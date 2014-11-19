@@ -10,7 +10,7 @@
 ```
 
 # 特性
-- 多个kv引擎的支持(LMDB / LevelDB / RocksDB(WIP))
+- 多个kv引擎的支持(LMDB / LevelDB / RocksDB)
 - 高速 (几乎达到C++版本的性能)
 - 方便
 - 即将支持bit-vector运算，会是做bitmap index的一个不错的选择。
