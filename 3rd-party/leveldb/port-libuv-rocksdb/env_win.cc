@@ -200,13 +200,10 @@ public:
 
 class WinDirectory : public Directory {
 public:
-  explicit WinDirectory(int fd) : fd_(fd) {}
-  ~WinDirectory() { close(fd_); }
+  explicit WinDirectory() { }
+  ~WinDirectory() { }
 
   virtual Status Fsync() { return Status::OK(); }
-
-private:
-  int fd_;
 };
 
 namespace {
@@ -397,22 +394,15 @@ class WinEnv : public Env {
   }
 
   virtual Status NewDirectory(const std::string& name, unique_ptr<Directory>* result) {
-    result->reset();
-    const int fd = open(name.c_str(), 0);
-    if (fd < 0) {
-      return IOError(name, errno);
-    }
-    else {
-      result->reset(new WinDirectory(fd));
-    }
+    result->reset(new WinDirectory());
     return Status::OK();
   }
 
   virtual Status CreateDirIfMissing(const std::string& dirname) {
     Status result;
 
-    int err = mkdir(dirname.c_str());
-    if (err != 0 && err != EEXIST) {
+    int err = _mkdir(dirname.c_str());
+    if (err != 0 && errno != EEXIST) {
       result = IOError(dirname, errno);
     } else if (!DirExists(dirname.c_str())) {
       result = Status::IOError("`" + dirname + "' exists but is not a directory");
@@ -866,14 +856,14 @@ static void InitDefaultEnv() { default_env = new WinEnv(); }
 static rocksdb::port::Mutex default_env_mutex;
 
 std::string Env::GenerateUniqueId() {
-	UUID uuid;
-	UuidCreate(&uuid);
-	unsigned char* str = NULL;
-	UuidToStringA(&uuid, &str);
+  UUID uuid;
+  UuidCreate(&uuid);
+  unsigned char* str = NULL;
+  UuidToStringA(&uuid, &str);
 
-	std::string ret((char*)str);
-	RpcStringFreeA(&str);
-	return ret;
+  std::string ret((char*)str);
+  RpcStringFreeA(&str);
+  return ret;
 }
 
 Env* Env::Default() {
