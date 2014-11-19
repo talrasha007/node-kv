@@ -6,6 +6,7 @@
   Windows + VS2013
   CentOS + gcc 4.8.1
   MacOS
+如果你的编译器不支持C++11，你可以选择安装不带RocksDB支持的0.2.x版本。
 ```
 
 # 特性
@@ -183,6 +184,7 @@ for (var i = cur.first(); i; i = cur.next()) {
 }
 ```
 ### - RocksDB
+Facebook [rocksdb](http://rocksdb.org/) wrapper.
 ```js
 var path = require('path'),
     rocksdb = require('node-kv').rocksdb;
