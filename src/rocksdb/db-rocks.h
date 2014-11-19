@@ -8,6 +8,17 @@ namespace kv {
 
 		template<class K, class V> class db : public node::ObjectWrap {
 		public:
+			typedef K key_type;
+			typedef V value_type;
+			typedef rocksdb::DB db_type;
+			typedef rocksdb::Cache cache_type;
+			typedef rocksdb::Slice slice_type;
+			typedef rocksdb::Options option_type;
+			typedef rocksdb::ReadOptions readoption_type;
+			typedef rocksdb::WriteOptions writeoption_type;
+			typedef rocksdb::Status status_type;
+			typedef rocksdb::Comparator comparator_type;
+
 			static void setup_export(v8::Handle<v8::Object>& exports);
 
 		private:
@@ -16,6 +27,9 @@ namespace kv {
 			static NAN_METHOD(get);
 			static NAN_METHOD(del);
 			static NAN_METHOD(write);
+
+		private:
+			template <class KK, class VV> friend class cursor;
 
 		private:
 			db(rocksdb::DB *pdb, rocksdb::ColumnFamilyHandle *db);
