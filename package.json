@@ -1,6 +1,6 @@
 {
   "name": "node-kv",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "repository": "https://github.com/talrasha007/node-kv.git",
   "description": "An embeded key-value store for node.js, extremely fast.",
   "readmeFile": "README.md",
