@@ -459,7 +459,25 @@ class WinEnv : public Env {
   }
 
   virtual void Schedule(void(*function)(void* arg), void* arg, Priority pri = LOW) {
-    QueueUserWorkItem(LPTHREAD_START_ROUTINE(function), arg, 0);
+    class fn_convert {
+    public:
+      static DWORD __stdcall call(void* ptr) {
+        fn_convert* pthis = (fn_convert*)ptr;
+        pthis->fn_(pthis->arg_);
+        delete pthis;
+        return 0;
+      }
+
+    public:
+      fn_convert(void(*function)(void* arg), void* arg) : fn_(function), arg_(arg) { }
+
+    private:
+      void(*fn_)(void* arg);
+      void* arg_;
+    };
+
+    fn_convert *cvt = new fn_convert(function, arg);
+    QueueUserWorkItem(fn_convert::call, cvt, 0);
   }
 
   virtual void SetBackgroundThreads(int number, Priority pri = LOW) {}
