@@ -13,7 +13,7 @@ If your compiler doesn't support C++11, you can install 0.2.x (without rocksdb) 
 [中文文档猛戳此处](https://github.com/talrasha007/node-kv/blob/master/README.zhcn.md)
 
 ## Features
-- Multiple kv engine support. (LMDB / LevelDB / RocksDB(WIP)).
+- Multiple kv engine support. (LMDB / LevelDB / RocksDB).
 - High speed. (> 80% speed of c++ version.)
 - Compressed bit-vector support, a good choice for bitmap index. (Coming soon.)
 - Embeded, easy to use.
