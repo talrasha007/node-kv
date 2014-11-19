@@ -5,7 +5,7 @@ var path = require('path'),
 var envPath = path.join(__dirname, 'testdb', 'rocks');
 try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
-describe('LevelDB int32-int32', function () {
+describe('RocksDB int32-int32', function () {
     var env = new rocksdb.Env({
         dir: envPath
     });
