@@ -41,6 +41,17 @@
           "OS=='linux'", {
             "cflags_cc": [ "-std=c++0x" ]
           }
+        ],
+        [
+          'OS == "mac"', {
+            'xcode_settings': {
+              'MACOSX_DEPLOYMENT_TARGET': '10.7',
+              'OTHER_CPLUSPLUSFLAGS': [
+                  '-std=c++11' ,
+                  '-stdlib=libc++'
+              ]
+            }
+          }
         ]
       ]
     }
