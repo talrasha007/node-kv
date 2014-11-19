@@ -14,6 +14,7 @@ void env::setup_export(v8::Handle<v8::Object>& exports) {
 	envTpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	// Add functions to the prototype
+	NODE_SET_PROTOTYPE_METHOD(envTpl, "open", env::open);
 
 	// Set exports
 	exports->Set(NanNew("Env"), envTpl->GetFunction());
