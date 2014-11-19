@@ -9,6 +9,9 @@ namespace kv {
 			static void setup_export(v8::Handle<v8::Object>& exports);
 
 		private:
+			template <class K, class V> friend class db;
+
+		private:
 			static NAN_METHOD(ctor);
 
 		private:
