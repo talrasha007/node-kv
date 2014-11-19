@@ -186,7 +186,7 @@ for (var i = cur.first(); i; i = cur.next()) {
 }
 ```
 
-# RocksDB
+### - RocksDB
 ```js
 var path = require('path'),
     rocksdb = require('node-kv').rocksdb;
