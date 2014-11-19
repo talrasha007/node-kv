@@ -1,7 +1,7 @@
 var path = require('path'),
     rocks = require('../').rocksdb;
 
-var envPath = path.join(__dirname, 'testdb', 'level');
+var envPath = path.join(__dirname, 'testdb', 'rocks');
 try { require('../lib/rmdir.js')(envPath); } catch (e) { }
 
 var env = new rocks.Env({
