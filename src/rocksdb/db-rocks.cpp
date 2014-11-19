@@ -45,23 +45,28 @@ KVDB_METHOD(ctor) {
 	NanScope();
 
 	NanUtf8String name(args[1]);
-
-	ColumnFamilyHandle* cf;
 	env *ew = node::ObjectWrap::Unwrap<env>(args[0]->ToObject());
 
 	ColumnFamilyOptions opt;
 	typedef lvl_rocks_comparator<K, Comparator, Slice> cmp;
 	if (cmp::get_cmp()) opt.comparator = cmp::get_cmp();
 
-	Status s = ew->_db->CreateColumnFamily(opt, *name, &cf);
-	if (!s.ok()) {
-		NanThrowError(s.ToString().c_str());
-		NanReturnUndefined();
-	}
+	int idx = ew->register_db(ColumnFamilyDescriptor(*name, opt));
 
-	db* ptr = new db(ew->_db, cf);
+	db* ptr = new db(idx);
 	ptr->Wrap(args.This());
 	NanReturnValue(args.This());
+}
+
+KVDB_METHOD(init) {
+	NanScope();
+
+	db *dw = ObjectWrap::Unwrap<db>(args.This());
+	env *ew = node::ObjectWrap::Unwrap<env>(args[0]->ToObject());
+	dw->_db = ew->_db;
+	dw->_cf = ew->_handles[dw->_cfidx];
+
+	NanReturnUndefined();
 }
 
 KVDB_METHOD(get) {
@@ -148,7 +153,7 @@ KVDB_METHOD(write) {
 	NanReturnUndefined();
 }
 
-template <class K, class V> db<K, V>::db(rocksdb::DB *pdb, ColumnFamilyHandle *cf) : _db(pdb), _cf(cf) {
+template <class K, class V> db<K, V>::db(int idx) : _cfidx(idx), _db(NULL), _cf(NULL) {
 
 }
 

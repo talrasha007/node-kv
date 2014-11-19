@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <rocksdb/db.h>
 
 namespace kv {
@@ -13,13 +14,19 @@ namespace kv {
 
 		private:
 			static NAN_METHOD(ctor);
+			static NAN_METHOD(open);
 
 		private:
-			env(rocksdb::DB *db);
+			env();
 			~env();
 
 		private:
+			int register_db(const rocksdb::ColumnFamilyDescriptor& desc);
+
+		private:
 			rocksdb::DB *_db;
+			std::vector<rocksdb::ColumnFamilyDescriptor> _desc;
+			std::vector<rocksdb::ColumnFamilyHandle*> _handles;
 		};
 	} // namespace rocks
 } // namespace kv

@@ -6,11 +6,13 @@ var env = new rocksdb.Env({
     cacheSize: 256 * 1024 * 1024 // 4MB by default.
 });
 
-var db = env.openDb({
+var db = env.registerDb({
     name: 'test',
     keyType: 'int32',
     valType: 'int32'
 });
+
+env.open();
 
 db.put(1, 1);
 console.log(db.get(1));

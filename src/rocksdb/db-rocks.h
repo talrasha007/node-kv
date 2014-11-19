@@ -23,6 +23,8 @@ namespace kv {
 
 		private:
 			static NAN_METHOD(ctor);
+			static NAN_METHOD(init);
+
 			static NAN_METHOD(put);
 			static NAN_METHOD(get);
 			static NAN_METHOD(del);
@@ -32,10 +34,11 @@ namespace kv {
 			template <class KK, class VV> friend class cursor;
 
 		private:
-			db(rocksdb::DB *pdb, rocksdb::ColumnFamilyHandle *db);
+			db(int idx);
 			~db();
 
 		private:
+			int _cfidx;
 			rocksdb::DB *_db;
 			rocksdb::ColumnFamilyHandle *_cf;
 		};
