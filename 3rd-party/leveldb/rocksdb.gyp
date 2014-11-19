@@ -127,7 +127,8 @@
                 'OS_MACOSX=1'
             ]
           , 'xcode_settings': {
-                'GCC_ENABLE_CPP_RTTI': 'YES'
+                'MACOSX_DEPLOYMENT_TARGET': '10.7'
+              , 'GCC_ENABLE_CPP_RTTI': 'YES'
               , 'WARNING_CFLAGS': [
                     '-Wno-sign-compare'
                   , '-Wno-unused-variable'
@@ -135,8 +136,7 @@
                   , '-Wno-ignored-qualifiers'
                 ]
               , 'OTHER_CPLUSPLUSFLAGS': [
-                    '-mmacosx-version-min=10.7'
-                  , '-std=c++11'
+                    '-std=c++11'
                   , '-stdlib=libc++'
                 ]
               , 'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'

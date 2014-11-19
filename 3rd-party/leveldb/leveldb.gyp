@@ -115,10 +115,15 @@
           , 'libraries': []
           , 'ccflags': []
           , 'xcode_settings': {
-                'WARNING_CFLAGS': [
+                'MACOSX_DEPLOYMENT_TARGET': '10.7'
+              , 'WARNING_CFLAGS': [
                     '-Wno-sign-compare'
                   , '-Wno-unused-variable'
                   , '-Wno-unused-function'
+                ]
+              , 'OTHER_CPLUSPLUSFLAGS': [
+                    '-std=c++11'
+                  , '-stdlib=libc++'
                 ]
             }
         }]
