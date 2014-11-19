@@ -18,10 +18,11 @@ namespace kv {
 			static NAN_METHOD(write);
 
 		private:
-			db(rocksdb::ColumnFamilyHandle *db);
+			db(rocksdb::DB *pdb, rocksdb::ColumnFamilyHandle *db);
 			~db();
 
 		private:
+			rocksdb::DB *_db;
 			rocksdb::ColumnFamilyHandle *_cf;
 		};
 	} // namespace rocks
