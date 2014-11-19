@@ -1,13 +1,18 @@
 #node-kv
 An embeded key-value store for node.js, extremely fast.
+```
+Because rocksdb uses a lot of C++11 features, your compiler should support C++11 to compile it.
+I test it on:
+  Windows + VS2013
+  CentOS 6.5 + gcc 4.8.1
+  MacOS
+```
 
 [中文文档猛戳此处](https://github.com/talrasha007/node-kv/blob/master/README.zhcn.md)
 
 ## Features
 - Multiple kv engine support. (LMDB / LevelDB / RocksDB(WIP)).
-- High speed.  
-  LMDB: >1,000,000op/s for get, >100,000op/s for put(batch).  
-  LevelDB: >600,000op/s for get, >350,000op/s for put(batch).
+- High speed. (> 80% speed of c++ version.)
 - Compressed bit-vector support, a good choice for bitmap index. (Coming soon.)
 - Embeded, easy to use.
 
@@ -163,6 +168,41 @@ var db = env.openDb({
     keyType: 'int32',
     valType: 'int32'
 });
+
+db.put(1, 1);
+console.log(db.get(1));
+db.del(1);
+console.log(db.get(1));
+
+db.del(3);
+db.batchPut(3, 4);
+console.log(db.get(3));
+db.flushBatchOps();
+console.log(db.get(3));
+
+var cur = db.cursor();
+for (var i = cur.first(); i; i = cur.next()) {
+    console.log([cur.key(), cur.val()]);
+}
+```
+
+# RocksDB
+```js
+var path = require('path'),
+    rocksdb = require('node-kv').rocksdb;
+
+var env = new rocksdb.Env({
+    dir: path.join(__dirname, 'testdb', 'rocks'),
+    cacheSize: 256 * 1024 * 1024 // 4MB by default.
+});
+
+var db = env.registerDb({
+    name: 'test',
+    keyType: 'int32',
+    valType: 'int32'
+});
+
+env.open();
 
 db.put(1, 1);
 console.log(db.get(1));
