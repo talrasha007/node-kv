@@ -34,7 +34,15 @@
           "OS == 'win'", {
             "defines": [
               "_HAS_EXCEPTIONS=0"
-            ]
+            ],
+            'msvs_settings': {
+              'VCCLCompilerTool': {
+                'RuntimeTypeInfo': 'false',
+                'EnableFunctionLevelLinking': 'true',
+                'ExceptionHandling': '2',
+                'DisableSpecificWarnings': [ '4267' ]
+              }
+            }
           }
         ],
         [
